@@ -92,6 +92,10 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .tabs button{flex:1;border:0;background:none;padding:8px 0;border-radius:16px;color:var(--sub);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}
 .tabs button svg{width:22px;height:22px}
 .tabs button.on{color:var(--main-ink);background:var(--main)}
+/* 時間の入力欄 */
+.tm input{flex:0 0 76px;width:76px;text-align:center;font-size:20px;font-weight:800;padding:10px 6px}
+.tm span{font-size:15px;color:var(--sub);font-weight:700}
+#mPresets .chip{padding:7px 13px;font-size:14px}
 label.sw{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub)}
 label.sw input{width:20px;height:20px;accent-color:var(--main)}
 </style>
@@ -148,12 +152,12 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
         <input id="newSub" placeholder="科目を追加" maxlength="12">
         <button class="ghost" id="addSub">追加</button>
       </div>
-      <div class="row">
-        <span style="font-size:14px">勉強した時間</span>
-        <select id="minutes" style="width:auto">
-          <option value="15">15分</option><option value="30">30分</option>
-          <option value="60" selected>60分</option><option value="90">90分</option><option value="120">120分</option>
-        </select>
+      <label class="f" for="mH">勉強した時間</label>
+      <div class="chips" id="mPresets"></div>
+      <div class="row tm">
+        <input id="mH" type="number" inputmode="numeric" min="0" max="5" step="1" value="1" aria-label="時間"><span>時間</span>
+        <input id="mM" type="number" inputmode="numeric" min="0" max="59" step="1" value="0" aria-label="分"><span>分</span>
+        <input id="minutes" type="hidden" value="60">
       </div>
       <button class="big" id="rec" disabled>2秒撮る</button>
       <div class="msg ok" id="saveMsg"></div>
@@ -326,7 +330,26 @@ $('#addSub').onclick=()=>{
 
 /* ---------- カメラ・撮影 ---------- */
 let stream=null,facing='environment',busy=false;
-function updateRecBtn(){$('#rec').disabled=!(stream&&subject)||busy}
+function updateRecBtn(){$('#rec').disabled=!(stream&&subject&&Number($('#minutes').value)>0)||busy}
+
+/* ---------- 勉強した時間(1分〜5時間で自由に) ---------- */
+const PRESETS=[15,30,45,60,90,120,180];
+function setMinutes(total,fromInput){
+  total=Math.max(0,Math.min(300,Math.round(total)||0));
+  $('#minutes').value=total;lsSet('sl_minutes',total);
+  if(!fromInput){$('#mH').value=Math.floor(total/60);$('#mM').value=total%60}
+  document.querySelectorAll('#mPresets .chip').forEach(b=>b.classList.toggle('on',Number(b.dataset.m)===total));
+  updateRecBtn();
+}
+PRESETS.forEach(m=>{
+  const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.m=m;b.textContent=fmtMin(m);
+  b.onclick=()=>setMinutes(m);$('#mPresets').appendChild(b);
+});
+['#mH','#mM'].forEach(q=>{
+  $(q).oninput=()=>setMinutes((Number($('#mH').value)||0)*60+(Number($('#mM').value)||0),true);
+  $(q).onblur=()=>setMinutes(Number($('#minutes').value));
+});
+setMinutes(lsGet('sl_minutes',60));
 async function startCam(){
   $('#camMsg').textContent='';
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('#camMsg').textContent='このブラウザではカメラが使えません';return}
@@ -375,7 +398,7 @@ async function uploadClip(blob,type,ts){
   const up=await sb.storage.from('clips').upload(path,blob,{contentType:type,upsert:false});
   if(up.error)return '動画を送れませんでした。電波を確認してもう一度撮ってください';
   const ins=await sb.from('clips').insert({user_id:me.id,ts:new Date(ts).toISOString(),day_key:dayKey(ts),subject,minutes:Number($('#minutes').value),path});
-  if(ins.error){await sb.storage.from('clips').remove([path]);return '記録を保存できませんでした'}
+  if(ins.error){await sb.storage.from('clips').remove([path]);return /check/i.test(ins.error.message)?'この時間では保存できませんでした(Supabaseの設定を確認してください)':'記録を保存できませんでした'}
   return '';
 }
 
