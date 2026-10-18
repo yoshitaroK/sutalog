@@ -110,16 +110,20 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
 
 <!-- ログイン -->
 <section class="card hidden" id="authView">
-  <div class="seg"><button id="tLogin" class="on">ログイン</button><button id="tSignup">新規登録</button></div>
-  <div id="nameWrap" class="hidden">
-    <label class="f">表示名(グループのみんなに見えます)</label>
-    <input id="aName" maxlength="20" placeholder="例:よしたろう">
-  </div>
-  <label class="f">メールアドレス</label>
-  <input id="aEmail" type="email" autocomplete="email">
-  <label class="f">パスワード(6文字以上)</label>
-  <input id="aPass" type="password" autocomplete="current-password">
-  <button class="big main" id="aGo">ログイン</button>
+  <div class="seg"><button type="button" id="tLogin" class="on">ログイン</button><button type="button" id="tSignup">新規登録</button></div>
+  <!-- form にしておくと、iPhone のパスワード保存・自動入力が使える -->
+  <form id="authForm" method="post" action="#" autocomplete="on">
+    <div id="nameWrap" class="hidden">
+      <label class="f" for="aName">表示名(グループのみんなに見えます)</label>
+      <input id="aName" name="nickname" maxlength="20" placeholder="例:よしたろう" autocomplete="nickname">
+    </div>
+    <label class="f" for="aEmail">メールアドレス</label>
+    <input id="aEmail" name="email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+    <label class="f" for="aPass">パスワード(6文字以上)</label>
+    <input id="aPass" name="password" type="password" autocomplete="current-password" minlength="6" required>
+    <label class="sw" style="margin-top:10px"><input type="checkbox" id="aShow">パスワードを表示</label>
+    <button type="submit" class="big main" id="aGo">ログイン</button>
+  </form>
   <div class="msg" id="aMsg"></div>
 </section>
 
@@ -228,7 +232,8 @@ const fmtMin=m=>m>=60?`${Math.floor(m/60)}時間${m%60?m%60+'分':''}`:`${m}分`
 
 /* ---------- 起動 ---------- */
 if(!SUPABASE_URL||!SUPABASE_KEY||!window.supabase){show($('#setupView'),true);throw new Error('setup')}
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+// ログイン状態をこの端末に保存し、期限が切れる前に自動で更新する(自分でログアウトするまで続く)
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 let me=null,myName='';
 
 const joinFromUrl=new URLSearchParams(location.search).get('join');
@@ -267,7 +272,11 @@ function setMode(m){
 }
 $('#tLogin').onclick=()=>setMode('login');
 $('#tSignup').onclick=()=>setMode('signup');
-$('#aGo').onclick=async()=>{
+$('#aShow').onchange=()=>{$('#aPass').type=$('#aShow').checked?'text':'password'};
+$('#authForm').onsubmit=async e=>{
+  e.preventDefault();
+  // 表示中のままだと iPhone がパスワード保存を出さないので、送る前に隠す
+  $('#aShow').checked=false;$('#aPass').type='password';
   const email=$('#aEmail').value.trim(),password=$('#aPass').value,name=$('#aName').value.trim();
   const m=$('#aMsg');m.className='msg';m.textContent='';
   if(!email||!password){m.textContent='メールアドレスとパスワードを入れてください';return}
