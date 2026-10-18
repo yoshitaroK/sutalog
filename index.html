@@ -337,6 +337,7 @@ $('#logout').onclick=()=>sb.auth.signOut();
 
 /* ---------- タブ ---------- */
 function openTab(p){
+  rollDay();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
   ['pShoot','pMine','pGroup'].forEach(id=>show($('#'+id),id===p));
   if(p==='pShoot'&&me)renderShootLive();
@@ -735,10 +736,25 @@ $('#remind').onchange=()=>{
   scheduleRemind();
 };
 
+/* ---------- 開いたまま朝4時をまたいだら「今日」を切り替える ---------- */
+let lastToday=dayKey(Date.now());
+function rollDay(){
+  const t=dayKey(Date.now());
+  if(t===lastToday)return;
+  if(mKey===lastToday)mKey=t;
+  if(gKey===lastToday)gKey=t;
+  lastToday=t;
+  if(!me)return;
+  if(!$('#pMine').classList.contains('hidden'))renderMine();
+  if(!$('#pGroup').classList.contains('hidden')&&curGroup)renderGroupDay();
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)rollDay()});
+setInterval(rollDay,60e3);
+
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-18b';
+const APP_VERSION='2026-10-19a';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
