@@ -152,6 +152,19 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .chat-form textarea:focus{border-color:var(--main)}
 .chat-send{width:42px;height:42px;flex:0 0 42px;border:0;border-radius:99px;background:var(--main);color:var(--main-ink);font-size:20px;font-weight:900}
 .chat-send:disabled{opacity:.3}
+/* 確認の表示 */
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px max(24px,env(safe-area-inset-right)) 24px max(24px,env(safe-area-inset-left));animation:mfade .15s}
+.modal-card{width:100%;max-width:340px;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:24px;padding:22px 20px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:mpop .18s}
+.modal-icon{width:56px;height:56px;margin:0 auto 12px;border-radius:18px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;font-size:26px}
+.modal-icon video{width:100%;height:100%;object-fit:cover}
+.modal-card h3{margin:0;font-size:18px;font-weight:800}
+.modal-card p{margin:8px 0 0;font-size:14px;color:var(--sub);line-height:1.6;white-space:pre-line}
+.modal-btns{display:flex;gap:10px;margin-top:18px}
+.modal-btns button{flex:1;padding:13px;border-radius:14px;font-size:16px;font-weight:800}
+.danger{border:0;background:var(--err);color:#fff}
+@keyframes mfade{from{opacity:0}}
+@keyframes mpop{from{transform:scale(.94);opacity:0}}
+@media (prefers-reduced-motion:reduce){.modal,.modal-card{animation:none}}
 label.sw{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub)}
 label.sw input{width:20px;height:20px;accent-color:var(--main)}
 </style>
@@ -280,6 +293,18 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
     <textarea id="chatInput" rows="1" maxlength="500" placeholder="メッセージを書く" aria-label="メッセージ"></textarea>
     <button type="submit" class="chat-send" id="chatSend" aria-label="送る" disabled>↑</button>
   </form>
+</div>
+
+<div class="modal hidden" id="modal" role="alertdialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody">
+  <div class="modal-card">
+    <div class="modal-icon" id="modalIcon"></div>
+    <h3 id="modalTitle"></h3>
+    <p id="modalBody"></p>
+    <div class="modal-btns">
+      <button type="button" class="ghost" id="modalCancel">やめる</button>
+      <button type="button" class="danger" id="modalOk">消す</button>
+    </div>
+  </div>
 </div>
 
 <nav class="tabs hidden" id="tabs">
@@ -539,8 +564,10 @@ function renderDay(box,clips,names){
     el.appendChild(nice);
     if(c.user_id===me.id){
       const x=document.createElement('button');x.className='x';x.textContent='×';
+      x.setAttribute('aria-label','この動画を消す');
       x.onclick=async()=>{
-        if(!confirm('この2秒を消しますか?'))return;
+        const ok=await askConfirm({title:'この2秒を消しますか?',body:`${fmtTime(c.ts)} ${c.subject}(${fmtMin(c.minutes)})\n消すと元に戻せません。勉強時間の記録も消えます。`,ok:'消す',video:c.url});
+        if(!ok)return;
         await sb.from('clips').delete().eq('id',c.id);
         await sb.storage.from('clips').remove([c.path]);
         isGroup?renderGroupDay():renderMine();
@@ -789,6 +816,23 @@ async function updateChatBadge(){
 }
 setInterval(()=>{if(me&&!document.hidden&&!chatGid)updateChatBadge()},60e3);
 
+/* ---------- 確認の表示(消す・抜けるの前に出す) ---------- */
+function askConfirm({title,body,ok='消す',icon='🗑️',video=null}){
+  return new Promise(resolve=>{
+    const m=$('#modal'),ic=$('#modalIcon');
+    $('#modalTitle').textContent=title;$('#modalBody').textContent=body||'';$('#modalOk').textContent=ok;
+    ic.innerHTML='';
+    if(video){const v=document.createElement('video');v.src=video+'#t=0.1';v.muted=true;v.playsInline=true;v.preload='metadata';ic.appendChild(v)}
+    else ic.textContent=icon;
+    show(m,true);$('#modalCancel').focus();
+    const done=v=>{show(m,false);ic.innerHTML='';$('#modalOk').onclick=$('#modalCancel').onclick=m.onclick=document.onkeydown=null;resolve(v)};
+    $('#modalOk').onclick=()=>done(true);
+    $('#modalCancel').onclick=()=>done(false);
+    m.onclick=e=>{if(e.target===m)done(false)};   // 外側を押したらやめる
+    document.onkeydown=e=>{if(e.key==='Escape')done(false)};
+  });
+}
+
 /* ---------- じぶん ---------- */
 let mKey=dayKey(Date.now());
 async function renderMine(){
@@ -870,7 +914,8 @@ $('#shareBtn').onclick=async()=>{
   catch(e){prompt('これをコピーして送ってください',text)}
 };
 $('#leaveBtn').onclick=async()=>{
-  if(!curGroup||!confirm(`「${curGroup.name}」を抜けますか?`))return;
+  if(!curGroup)return;
+  if(!await askConfirm({title:'グループを抜けますか?',body:`「${curGroup.name}」のみんなの動画やチャットが見られなくなります。\nもう一度入るには招待コードが必要です。`,ok:'抜ける',icon:'👋'}))return;
   await sb.from('group_members').delete().eq('group_id',curGroup.id).eq('user_id',me.id);
   curGroup=null;lsSet('sl_group',null);gmsg('グループを抜けました',true);loadGroups();
 };
@@ -912,7 +957,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-19b';
+const APP_VERSION='2026-10-19c';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
