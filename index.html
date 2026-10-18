@@ -96,6 +96,34 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .tm input{flex:0 0 76px;width:76px;text-align:center;font-size:20px;font-weight:800;padding:10px 6px}
 .tm span{font-size:15px;color:var(--sub);font-weight:700}
 #mPresets .chip{padding:7px 13px;font-size:14px}
+/* いま勉強中 */
+.live-dot{display:inline-block;width:9px;height:9px;border-radius:99px;background:#ff3b3b;margin-right:8px;vertical-align:middle;box-shadow:0 0 0 0 rgba(255,59,59,.6);animation:livepulse 1.6s infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(255,59,59,.6)}70%{box-shadow:0 0 0 8px rgba(255,59,59,0)}100%{box-shadow:0 0 0 0 rgba(255,59,59,0)}}
+@media (prefers-reduced-motion:reduce){.live-dot{animation:none}}
+.live-banner{display:flex;align-items:center;gap:8px;width:100%;margin-top:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,59,59,.35);background:rgba(255,59,59,.08);color:var(--ink);font-size:14px;font-weight:700;text-align:left}
+.live-banner b{color:var(--main)}
+.live-banner .go{margin-left:auto;color:var(--sub);font-size:12px;white-space:nowrap}
+.live-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.live-row:first-child{border-top:0}
+.live-row b{font-size:15px}
+.live-row .sub{color:var(--sub);font-size:13px;margin-left:auto;white-space:nowrap}
+.live-row .subj{background:var(--main);color:var(--main-ink);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800}
+/* ナイス */
+.th .nice{position:absolute;top:5px;left:5px;display:flex;align-items:center;gap:3px;background:rgba(0,0,0,.6);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:99px;height:26px;padding:0 8px;font-size:12px;font-weight:800;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.th .nice.on{background:var(--main);color:var(--main-ink);border-color:var(--main)}
+.th span.nice{pointer-events:none}
+/* みんなで目標 */
+.goal{background:#0f1115;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:0 0 14px}
+.goal-top{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--sub);font-weight:700}
+.goal-top b{color:var(--ink);font-size:15px}
+.goal-top .link{margin-left:auto;font-size:13px}
+.goal-bar{height:12px;border-radius:99px;background:#1b1e25;margin-top:10px;overflow:hidden}
+.goal-bar i{display:block;height:100%;border-radius:99px;background:var(--main);box-shadow:0 0 12px rgba(198,255,61,.5);transition:width .6s}
+.goal-msg{font-size:13px;margin-top:8px;color:var(--sub);font-weight:600}
+.goal-msg b{color:var(--main)}
+.goal.done{border-color:var(--main);box-shadow:0 0 18px rgba(198,255,61,.18)}
+.goal-edit{display:flex;gap:8px;align-items:center;margin-top:10px}
+.goal-edit input{width:90px;flex:0 0 90px;text-align:center;font-weight:800}
 label.sw{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub)}
 label.sw input{width:20px;height:20px;accent-color:var(--main)}
 </style>
@@ -135,6 +163,7 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
 
   <!-- 撮る -->
   <div id="pShoot">
+    <button type="button" class="live-banner hidden" id="liveShoot"></button>
     <section class="card">
       <h2>いま勉強していることを撮る</h2>
       <div class="cam">
@@ -199,6 +228,12 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
       <div class="row"><button class="link" id="leaveBtn" style="color:var(--err)">このグループを抜ける</button></div>
     </section>
 
+    <section class="card hidden" id="gLive">
+      <h2><span class="live-dot"></span>いま勉強中</h2>
+      <div id="gLiveBody"></div>
+      <div class="note">1時間以内に撮った人が出ます</div>
+    </section>
+
     <section class="card hidden" id="gDay">
       <div class="nav"><button class="ghost" id="gPrev">◀</button><b id="gDayLabel"></b><button class="ghost" id="gNext">▶</button></div>
       <div id="gBody"></div>
@@ -255,6 +290,7 @@ async function onSession(session){
   await ensureProfile();
   $('#meName').textContent=myName;
   show($('#authView'),false);show($('#appView'),true);show($('#tabs'),true);show($('#meBox'),true);
+  renderShootLive();
   if(joinFromUrl){$('#joinCode').value=joinFromUrl.toUpperCase();openTab('pGroup')}
 }
 async function ensureProfile(){
@@ -303,6 +339,7 @@ $('#logout').onclick=()=>sb.auth.signOut();
 function openTab(p){
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
   ['pShoot','pMine','pGroup'].forEach(id=>show($('#'+id),id===p));
+  if(p==='pShoot'&&me)renderShootLive();
   if(p==='pMine')renderMine();
   if(p==='pGroup')loadGroups();
   window.scrollTo(0,0);
@@ -381,7 +418,7 @@ function record(){
     const err=await uploadClip(blob,type,ts);
     $('#saveMsg').className=err?'msg':'msg ok';
     $('#saveMsg').textContent=err||`保存しました(${subject} ${fmtMin(Number($('#minutes').value))})`;
-    if(!err){$('#banner').style.display='none';scheduleRemind()}
+    if(!err){$('#banner').style.display='none';scheduleRemind();renderShootLive()}
     busy=false;updateRecBtn();
   };
   mr.start();
@@ -423,6 +460,7 @@ function renderDay(box,clips,names){
   const m=document.createElement('div');m.className='tot main';m.textContent=(isGroup?'みんなで ':'合計 ')+fmtMin(total);t.appendChild(m);
   Object.entries(by).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{const d=document.createElement('div');d.className='tot';d.textContent=`${k} ${fmtMin(v)}`;t.appendChild(d)});
   box.appendChild(t);
+  if(isGroup&&curGroup&&curGroup.goal_minutes!=null)box.appendChild(goalBox(total));
   if(!clips.length){const e=document.createElement('div');e.className='empty';e.textContent='この日の記録はまだありません';box.appendChild(e);return}
 
   const play=document.createElement('button');play.className='big main';play.style.marginTop='0';
@@ -453,6 +491,9 @@ function renderDay(box,clips,names){
     cap.textContent=`${fmtTime(c.ts)} ${c.subject}`+(isGroup?`\n${names[c.user_id]||''}`:'');
     cap.style.whiteSpace='pre-line';
     el.append(vv,cap);
+    const nice=document.createElement(c.user_id===me.id?'span':'button');nice.className='nice hidden';nice.dataset.id=c.id;
+    if(c.user_id!==me.id){nice.type='button';nice.setAttribute('aria-label','ナイス');nice.onclick=()=>toggleNice(c.id,nice)}
+    el.appendChild(nice);
     if(c.user_id===me.id){
       const x=document.createElement('button');x.className='x';x.textContent='×';
       x.onclick=async()=>{
@@ -466,8 +507,128 @@ function renderDay(box,clips,names){
     g.appendChild(el);
   });
   box.appendChild(g);
+  loadNice(clips,box,t,isGroup);
   const n=document.createElement('div');n.className='note';n.textContent='1日は朝4時から翌朝4時まで。×は自分の動画だけ消せます。';box.appendChild(n);
 }
+
+/* ---------- ナイス(👏) ---------- */
+let niceMap={};   // clip_id → Set(user_id)
+let niceReady=false;
+function paintNice(btn){
+  const set=niceMap[btn.dataset.id]||new Set();
+  const mine=set.has(me.id),n=set.size,own=btn.tagName==='SPAN';
+  btn.classList.toggle('on',mine);
+  btn.textContent='👏'+(n?' '+n:'');
+  show(btn,!own||n>0);   // 自分の動画は、もらったときだけ数を出す
+}
+async function loadNice(clips,box,totals,isGroup){
+  if(!clips.length)return;
+  const {data,error}=await sb.from('reactions').select('clip_id,user_id').in('clip_id',clips.map(c=>c.id));
+  if(error)return;   // まだ Supabase に設定が無いときは何も出さない
+  niceReady=true;
+  clips.forEach(c=>niceMap[c.id]=new Set());
+  data.forEach(r=>(niceMap[r.clip_id]||(niceMap[r.clip_id]=new Set())).add(r.user_id));
+  box.querySelectorAll('.nice').forEach(paintNice);
+  if(!isGroup){
+    const got=clips.reduce((s,c)=>s+(niceMap[c.id]?niceMap[c.id].size:0),0);
+    if(got){const d=document.createElement('div');d.className='tot';d.textContent=`👏 もらった ${got}`;totals.appendChild(d)}
+  }
+}
+async function toggleNice(id,btn){
+  const set=niceMap[id]||(niceMap[id]=new Set());
+  const had=set.has(me.id);
+  had?set.delete(me.id):set.add(me.id);paintNice(btn);   // 先に見た目を変える
+  try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
+  const {error}=had
+    ?await sb.from('reactions').delete().eq('clip_id',id).eq('user_id',me.id)
+    :await sb.from('reactions').insert({clip_id:id});
+  if(error){had?set.add(me.id):set.delete(me.id);paintNice(btn)}
+}
+
+/* ---------- みんなで目標 ---------- */
+function goalBox(total){
+  const goal=curGroup.goal_minutes,pct=Math.min(100,Math.round(total/goal*100));
+  const box=document.createElement('div');box.className='goal'+(total>=goal?' done':'');
+  const top=document.createElement('div');top.className='goal-top';
+  const lb=document.createElement('span');lb.textContent='みんなで目標';
+  const v=document.createElement('b');v.textContent=`${fmtMin(total)} / ${fmtMin(goal)}`;
+  const ed=document.createElement('button');ed.type='button';ed.className='link';ed.textContent='変える';
+  top.append(lb,v,ed);
+  const bar=document.createElement('div');bar.className='goal-bar';const fill=document.createElement('i');fill.style.width=pct+'%';bar.appendChild(fill);
+  const msg=document.createElement('div');msg.className='goal-msg';
+  msg.innerHTML=total>=goal?'<b>目標達成!</b> みんなおつかれさま':`あと <b>${fmtMin(goal-total)}</b>。ひとり30分でも大きな一歩`;
+  box.append(top,bar,msg);
+  ed.onclick=()=>{
+    if(box.querySelector('.goal-edit'))return;
+    const row=document.createElement('div');row.className='goal-edit';
+    const inp=document.createElement('input');inp.type='number';inp.inputMode='decimal';inp.min='0.5';inp.max='100';inp.step='0.5';inp.value=goal/60;inp.setAttribute('aria-label','目標(時間)');
+    const u=document.createElement('span');u.textContent='時間';u.style.cssText='font-size:14px;color:var(--sub);font-weight:700';
+    const ok=document.createElement('button');ok.type='button';ok.className='ghost';ok.textContent='保存';
+    row.append(inp,u,ok);box.appendChild(row);inp.focus();
+    ok.onclick=async()=>{
+      const m=Math.round(Number(inp.value)*60);
+      if(!(m>=30&&m<=6000)){msg.textContent='30分〜100時間で入れてください';return}
+      ok.disabled=true;
+      const {error}=await sb.rpc('set_group_goal',{gid:curGroup.id,minutes:m});
+      ok.disabled=false;
+      if(error){msg.textContent='変えられませんでした。もう一度試してください';return}
+      curGroup.goal_minutes=m;const g=groups.find(x=>x.id===curGroup.id);if(g)g.goal_minutes=m;
+      renderGroupDay();
+    };
+  };
+  return box;
+}
+
+/* ---------- いま勉強中(1時間以内に撮った人) ---------- */
+const LIVE_MIN=60;
+async function fetchLive(userIds){
+  if(!userIds.length)return [];
+  const since=new Date(Date.now()-LIVE_MIN*60e3).toISOString();
+  const {data}=await sb.from('clips').select('user_id,ts,subject').in('user_id',userIds).gte('ts',since).order('ts',{ascending:false});
+  const seen=new Set();
+  return (data||[]).filter(c=>!seen.has(c.user_id)&&seen.add(c.user_id));
+}
+const agoText=ts=>{const m=Math.max(0,Math.round((Date.now()-new Date(ts))/60e3));return m<1?'たった今':`${m}分前`};
+async function renderGroupLive(){
+  if(!curGroup)return;
+  const gid=curGroup.id,list=await fetchLive(members);
+  if(!curGroup||gid!==curGroup.id)return;
+  const box=$('#gLiveBody');box.innerHTML='';
+  show($('#gLive'),true);
+  if(!list.length){const e=document.createElement('div');e.className='empty';e.textContent='いまは誰も記録していません。最初の1本を撮ろう';box.appendChild(e);return}
+  list.forEach(c=>{
+    const r=document.createElement('div');r.className='live-row';
+    const n=document.createElement('b');n.textContent=(names[c.user_id]||'?')+(c.user_id===me.id?'(自分)':'');
+    const sj=document.createElement('span');sj.className='subj';sj.textContent=c.subject;
+    const a=document.createElement('span');a.className='sub';a.textContent=agoText(c.ts);
+    r.append(n,sj,a);box.appendChild(r);
+  });
+}
+// 撮るタブ:選んでいるグループで、自分以外に勉強中の人がいたら知らせる
+async function renderShootLive(){
+  const el=$('#liveShoot');
+  const {data:gs}=await sb.from('groups').select('id,name').order('created_at');
+  if(!gs||!gs.length){show(el,false);return}
+  const saved=lsGet('sl_group',null),g=gs.find(x=>x.id===saved)||gs[0];
+  const {data:mem}=await sb.from('group_members').select('user_id').eq('group_id',g.id);
+  const ids=(mem||[]).map(m=>m.user_id).filter(id=>id!==me.id);
+  const list=await fetchLive(ids);
+  if(!list.length){show(el,false);return}
+  const {data:profs}=await sb.from('profiles').select('id,name').in('id',list.map(c=>c.user_id));
+  const nm={};(profs||[]).forEach(p=>nm[p.id]=p.name);
+  const who=list.slice(0,3).map(c=>nm[c.user_id]||'?').join('・')+(list.length>3?` ほか${list.length-3}人`:'');
+  el.innerHTML='';
+  const dot=document.createElement('span');dot.className='live-dot';
+  const tx=document.createElement('span');const b=document.createElement('b');b.textContent=who;tx.append(b,document.createTextNode(' が今勉強中'));
+  const go=document.createElement('span');go.className='go';go.textContent=g.name+' ›';
+  el.append(dot,tx,go);show(el,true);
+}
+$('#liveShoot').onclick=()=>openTab('pGroup');
+setInterval(()=>{
+  if(!me||document.hidden)return;
+  if(!$('#pShoot').classList.contains('hidden'))renderShootLive();
+  if(!$('#pGroup').classList.contains('hidden'))renderGroupLive();
+},60e3);
 
 /* ---------- じぶん ---------- */
 let mKey=dayKey(Date.now());
@@ -484,12 +645,14 @@ $('#mNext').onclick=()=>{if(mKey<dayKey(Date.now())){mKey=shiftKey(mKey,1);rende
 let groups=[],curGroup=null,members=[],names={},gKey=dayKey(Date.now());
 function gmsg(t,ok){$('#gMsg').className=ok?'msg ok':'msg';$('#gMsg').textContent=t||''}
 async function loadGroups(){
-  const {data}=await sb.from('groups').select('id,name,code,created_at').order('created_at');
+  // goal_minutes は Supabase に設定を足すまで無いので、無ければ従来どおり読む
+  let {data,error}=await sb.from('groups').select('id,name,code,created_at,goal_minutes').order('created_at');
+  if(error)({data}=await sb.from('groups').select('id,name,code,created_at').order('created_at'));
   groups=data||[];
   if(curGroup&&!groups.find(g=>g.id===curGroup.id))curGroup=null;
   if(!curGroup){const saved=lsGet('sl_group',null);curGroup=groups.find(g=>g.id===saved)||groups[0]||null}
   renderGroupList();
-  if(curGroup)selectGroup(curGroup);else{show($('#gDetail'),false);show($('#gDay'),false)}
+  if(curGroup)selectGroup(curGroup);else{show($('#gDetail'),false);show($('#gDay'),false);show($('#gLive'),false)}
 }
 function renderGroupList(){
   const box=$('#gList');box.innerHTML='';
@@ -511,7 +674,7 @@ async function selectGroup(g){
   names={};(profs||[]).forEach(p=>names[p.id]=p.name);
   const mb=$('#gMembers');mb.innerHTML='';
   members.forEach(id=>{const s=document.createElement('span');s.className='mem';s.textContent=(names[id]||'?')+(id===me.id?'(自分)':'');mb.appendChild(s)});
-  renderGroupDay();
+  renderGroupDay();renderGroupLive();
 }
 async function renderGroupDay(){
   if(!curGroup)return;
