@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f6f5c">
+<title>スタログ</title>
+<style>
+:root{--bg:#f4f1ea;--card:#fff;--ink:#222;--sub:#6b6b6b;--main:#1f6f5c;--accent:#e8a23a;--line:#e3ded2;--err:#b33}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink);padding:0 16px calc(90px + env(safe-area-inset-bottom))}
+header{padding:calc(14px + env(safe-area-inset-top)) 0 6px;display:flex;align-items:center;gap:8px}
+h1{margin:0;font-size:22px;color:var(--main)}
+header .me{margin-left:auto;font-size:13px;color:var(--sub);display:flex;gap:8px;align-items:center}
+.card{background:var(--card);border-radius:16px;padding:14px;margin:12px 0;border:1px solid var(--line)}
+h2{font-size:15px;margin:0 0 10px}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff;width:100%}
+label.f{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+.big{width:100%;margin-top:12px;padding:15px;border:0;border-radius:14px;background:var(--accent);color:#222;font-size:17px;font-weight:700}
+.big.main{background:var(--main);color:#fff}
+.big:disabled{opacity:.5}
+.ghost{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;color:var(--ink)}
+.link{border:0;background:none;color:var(--main);text-decoration:underline;padding:0}
+.msg{color:var(--err);font-size:13px;margin-top:8px;min-height:1em;white-space:pre-wrap}
+.ok{color:var(--main)}
+.hidden{display:none!important}
+.row{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.row input{flex:1;width:auto}
+.seg{display:flex;background:var(--bg);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:none;padding:8px;border-radius:9px;color:var(--sub)}
+.seg button.on{background:#fff;color:var(--ink);font-weight:700}
+.cam{position:relative;border-radius:12px;overflow:hidden;background:#111;aspect-ratio:3/4;max-height:52vh;width:100%}
+.cam video{width:100%;height:100%;object-fit:cover}
+.cam .count{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:72px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.cam .rec{position:absolute;top:10px;left:10px;background:#d33;color:#fff;border-radius:99px;padding:2px 10px;font-size:12px;display:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font-size:15px;color:var(--ink)}
+.chip.on{background:var(--main);color:#fff;border-color:var(--main)}
+.banner{display:none;background:#fff3d6;border:1px solid #f0d28a;border-radius:12px;padding:10px 12px;margin-top:12px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.nav b{font-size:16px}
+.totals{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+.tot{background:var(--bg);border-radius:10px;padding:6px 10px;font-size:14px}
+.tot.main{background:var(--main);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.th{position:relative;border-radius:10px;overflow:hidden;background:#111;aspect-ratio:3/4}
+.th video{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.th .cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff;font-size:11px;padding:12px 6px 4px;line-height:1.35}
+.th .x{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:0;border-radius:99px;width:26px;height:26px;padding:0}
+.pwrap{position:relative;margin-top:12px}
+.pwrap video{width:100%;border-radius:12px;background:#111;max-height:60vh;display:block}
+.pwrap .ov{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.55);color:#fff;border-radius:8px;padding:4px 8px;font-size:13px}
+.empty{color:var(--sub);font-size:14px;padding:8px 0}
+.note{font-size:12px;color:var(--sub);margin-top:10px}
+.glist{display:flex;flex-direction:column;gap:8px}
+.gitem{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;text-align:left;width:100%}
+.gitem.on{border-color:var(--main);box-shadow:0 0 0 2px var(--main) inset}
+.gitem b{flex:1}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:22px;letter-spacing:3px;font-weight:700;color:var(--main)}
+.members{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mem{font-size:13px;background:var(--bg);border-radius:99px;padding:4px 10px}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:10}
+.tabs button{flex:1;border:0;background:none;padding:6px 0;color:var(--sub);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabs button span{font-size:20px}
+.tabs button.on{color:var(--main);font-weight:700}
+label.sw{display:flex;align-items:center;gap:8px;font-size:14px}
+label.sw input{width:auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>スタログ</h1>
+  <div class="me hidden" id="meBox"><span id="meName"></span><button class="link" id="logout">ログアウト</button></div>
+</header>
+
+<!-- 設定がまだのとき -->
+<section class="card hidden" id="setupView">
+  <h2>最初の設定がまだです</h2>
+  <p style="font-size:14px">index.html の中の <b>SUPABASE_URL</b> と <b>SUPABASE_KEY</b> に、Supabase の値を入れてください。</p>
+</section>
+
+<!-- ログイン -->
+<section class="card hidden" id="authView">
+  <div class="seg"><button id="tLogin" class="on">ログイン</button><button id="tSignup">新規登録</button></div>
+  <div id="nameWrap" class="hidden">
+    <label class="f">表示名(グループのみんなに見えます)</label>
+    <input id="aName" maxlength="20" placeholder="例:よしたろう">
+  </div>
+  <label class="f">メールアドレス</label>
+  <input id="aEmail" type="email" autocomplete="email">
+  <label class="f">パスワード(6文字以上)</label>
+  <input id="aPass" type="password" autocomplete="current-password">
+  <button class="big main" id="aGo">ログイン</button>
+  <div class="msg" id="aMsg"></div>
+</section>
+
+<main id="appView" class="hidden">
+
+  <!-- 撮る -->
+  <div id="pShoot">
+    <section class="card">
+      <h2>いま勉強していることを撮る</h2>
+      <div class="cam">
+        <video id="cam" playsinline muted autoplay></video>
+        <div class="rec" id="recMark">● 撮影中</div>
+        <div class="count" id="count"></div>
+      </div>
+      <div class="row">
+        <button class="ghost" id="startCam">カメラを開く</button>
+        <button class="ghost" id="flip">カメラ切替</button>
+      </div>
+      <div class="msg" id="camMsg"></div>
+      <div style="margin-top:6px" class="chips" id="subjects"></div>
+      <div class="row">
+        <input id="newSub" placeholder="科目を追加" maxlength="12">
+        <button class="ghost" id="addSub">追加</button>
+      </div>
+      <div class="row">
+        <span style="font-size:14px">勉強した時間</span>
+        <select id="minutes" style="width:auto">
+          <option value="15">15分</option><option value="30">30分</option>
+          <option value="60" selected>60分</option><option value="90">90分</option><option value="120">120分</option>
+        </select>
+      </div>
+      <button class="big" id="rec" disabled>2秒撮る</button>
+      <div class="msg ok" id="saveMsg"></div>
+      <div class="banner" id="banner">⏰ 1時間たちました。いまの勉強を撮りましょう</div>
+      <div class="row"><label class="sw"><input type="checkbox" id="remind">このページを開いている間、1時間ごとに知らせる</label></div>
+    </section>
+  </div>
+
+  <!-- じぶん -->
+  <div id="pMine" class="hidden">
+    <section class="card">
+      <div class="nav"><button class="ghost" id="mPrev">◀</button><b id="mDay"></b><button class="ghost" id="mNext">▶</button></div>
+      <div id="mBody"></div>
+    </section>
+  </div>
+
+  <!-- グループ -->
+  <div id="pGroup" class="hidden">
+    <section class="card">
+      <h2>わたしのグループ</h2>
+      <div class="glist" id="gList"></div>
+      <div class="empty hidden" id="gEmpty">まだグループに入っていません</div>
+      <div class="row">
+        <input id="joinCode" placeholder="招待コード(6文字)" maxlength="6" style="text-transform:uppercase">
+        <button class="ghost" id="joinBtn">参加</button>
+      </div>
+      <div class="row">
+        <input id="newGroup" placeholder="新しいグループ名" maxlength="20">
+        <button class="ghost" id="createBtn">作る</button>
+      </div>
+      <div class="msg" id="gMsg"></div>
+    </section>
+
+    <section class="card hidden" id="gDetail">
+      <h2 id="gName"></h2>
+      <div style="font-size:13px;color:var(--sub)">招待コード</div>
+      <div class="row" style="margin-top:2px"><span class="code" id="gCode"></span><button class="ghost" id="shareBtn">友達に送る</button></div>
+      <div class="members" id="gMembers"></div>
+      <div class="row"><button class="link" id="leaveBtn" style="color:var(--err)">このグループを抜ける</button></div>
+    </section>
+
+    <section class="card hidden" id="gDay">
+      <div class="nav"><button class="ghost" id="gPrev">◀</button><b id="gDayLabel"></b><button class="ghost" id="gNext">▶</button></div>
+      <div id="gBody"></div>
+    </section>
+  </div>
+</main>
+
+<nav class="tabs hidden" id="tabs">
+  <button data-p="pShoot" class="on"><span>📷</span>撮る</button>
+  <button data-p="pMine"><span>📅</span>じぶん</button>
+  <button data-p="pGroup"><span>👥</span>グループ</button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js"></script>
+<script>
+/* ======== ここに Supabase の値を入れる ======== */
+const SUPABASE_URL = 'https://wsrfoxuckcacfzkaemdr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Mlr40hs-VC5SX5nwarcDWA_k79Kj-PP';
+/* ============================================ */
+
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,'0');
+const show=(el,on)=>el.classList.toggle('hidden',!on);
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+/* ---------- 日付(朝4時区切り) ---------- */
+function keyOf(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function dayKey(ts){return keyOf(new Date(ts-4*3600e3))}
+function keyToDate(k){const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)}
+function shiftKey(k,n){const d=keyToDate(k);d.setDate(d.getDate()+n);return keyOf(d)}
+function labelOf(k){const d=keyToDate(k);return `${d.getMonth()+1}月${d.getDate()}日(${'日月火水木金土'[d.getDay()]})`+(k===dayKey(Date.now())?' 今日':'')}
+const fmtTime=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const fmtMin=m=>m>=60?`${Math.floor(m/60)}時間${m%60?m%60+'分':''}`:`${m}分`;
+
+/* ---------- 起動 ---------- */
+if(!SUPABASE_URL||!SUPABASE_KEY||!window.supabase){show($('#setupView'),true);throw new Error('setup')}
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,myName='';
+
+const joinFromUrl=new URLSearchParams(location.search).get('join');
+
+sb.auth.onAuthStateChange((_e,session)=>{setTimeout(()=>onSession(session),0)});
+let started=false;
+async function onSession(session){
+  if(!session){
+    me=null;started=false;
+    show($('#authView'),true);show($('#appView'),false);show($('#tabs'),false);show($('#meBox'),false);
+    return;
+  }
+  if(started&&me&&me.id===session.user.id)return;
+  me=session.user;started=true;
+  await ensureProfile();
+  $('#meName').textContent=myName;
+  show($('#authView'),false);show($('#appView'),true);show($('#tabs'),true);show($('#meBox'),true);
+  if(joinFromUrl){$('#joinCode').value=joinFromUrl.toUpperCase();openTab('pGroup')}
+}
+async function ensureProfile(){
+  const {data}=await sb.from('profiles').select('name').eq('id',me.id).maybeSingle();
+  if(data){myName=data.name;return}
+  myName=(me.user_metadata&&me.user_metadata.name)||me.email.split('@')[0];
+  await sb.from('profiles').insert({id:me.id,name:myName});
+}
+
+/* ---------- ログイン・登録 ---------- */
+let mode='login';
+function setMode(m){
+  mode=m;
+  $('#tLogin').classList.toggle('on',m==='login');$('#tSignup').classList.toggle('on',m==='signup');
+  show($('#nameWrap'),m==='signup');
+  $('#aGo').textContent=m==='login'?'ログイン':'登録する';
+  $('#aPass').autocomplete=m==='login'?'current-password':'new-password';
+  $('#aMsg').textContent='';
+}
+$('#tLogin').onclick=()=>setMode('login');
+$('#tSignup').onclick=()=>setMode('signup');
+$('#aGo').onclick=async()=>{
+  const email=$('#aEmail').value.trim(),password=$('#aPass').value,name=$('#aName').value.trim();
+  const m=$('#aMsg');m.className='msg';m.textContent='';
+  if(!email||!password){m.textContent='メールアドレスとパスワードを入れてください';return}
+  if(mode==='signup'&&!name){m.textContent='表示名を入れてください';return}
+  $('#aGo').disabled=true;
+  try{
+    if(mode==='login'){
+      const {error}=await sb.auth.signInWithPassword({email,password});
+      if(error)m.textContent=/confirm/i.test(error.message)?'メールの確認がまだです。届いたメールのリンクを押してください':'メールアドレスかパスワードが違います';
+    }else{
+      const {data,error}=await sb.auth.signUp({email,password,options:{data:{name},emailRedirectTo:location.href.split('#')[0]}});
+      if(error)m.textContent=/registered/i.test(error.message)?'このメールアドレスは登録済みです':/password/i.test(error.message)?'パスワードは6文字以上にしてください':'登録できませんでした:'+error.message;
+      else if(!data.session){m.className='msg ok';m.textContent='確認メールを送りました。メールのリンクを押してから、ログインしてください'}
+    }
+  }finally{$('#aGo').disabled=false}
+};
+$('#logout').onclick=()=>sb.auth.signOut();
+
+/* ---------- タブ ---------- */
+function openTab(p){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  ['pShoot','pMine','pGroup'].forEach(id=>show($('#'+id),id===p));
+  if(p==='pMine')renderMine();
+  if(p==='pGroup')loadGroups();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>openTab(b.dataset.p));
+
+/* ---------- 科目 ---------- */
+let subjects=lsGet('sl_subjects',['数学','英語','国語','理科','社会']);
+let subject=lsGet('sl_subject',null);
+function renderSubjects(){
+  const box=$('#subjects');box.innerHTML='';
+  subjects.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='chip'+(s===subject?' on':'');b.textContent=s;
+    b.onclick=()=>{subject=s;lsSet('sl_subject',s);renderSubjects();updateRecBtn()};
+    box.appendChild(b);
+  });
+}
+$('#addSub').onclick=()=>{
+  const v=$('#newSub').value.trim();
+  if(!v||subjects.includes(v))return;
+  subjects.push(v);subject=v;lsSet('sl_subjects',subjects);lsSet('sl_subject',v);
+  $('#newSub').value='';renderSubjects();updateRecBtn();
+};
+
+/* ---------- カメラ・撮影 ---------- */
+let stream=null,facing='environment',busy=false;
+function updateRecBtn(){$('#rec').disabled=!(stream&&subject)||busy}
+async function startCam(){
+  $('#camMsg').textContent='';
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('#camMsg').textContent='このブラウザではカメラが使えません';return}
+  try{
+    if(stream)stream.getTracks().forEach(t=>t.stop());
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:720},height:{ideal:960}},audio:false});
+    $('#cam').srcObject=stream;$('#startCam').classList.add('hidden');
+  }catch(e){stream=null;$('#camMsg').textContent='カメラを使えませんでした。ブラウザのカメラ許可を確認してください'}
+  updateRecBtn();
+}
+$('#startCam').onclick=startCam;
+$('#flip').onclick=()=>{facing=facing==='environment'?'user':'environment';startCam()};
+
+function record(){
+  if(!stream||!subject||busy)return;
+  if(!window.MediaRecorder){$('#camMsg').textContent='このブラウザは録画に対応していません';return}
+  busy=true;updateRecBtn();$('#saveMsg').textContent='';
+  const mt=['video/mp4','video/webm;codecs=vp9','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+  let mr;
+  try{mr=new MediaRecorder(stream,mt?{mimeType:mt,videoBitsPerSecond:1500000}:undefined)}
+  catch(e){busy=false;updateRecBtn();$('#camMsg').textContent='録画を始められませんでした';return}
+  const chunks=[],ts=Date.now();
+  mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  mr.onstop=async()=>{
+    $('#recMark').style.display='none';$('#count').style.display='none';
+    const type=(mr.mimeType||mt||'video/webm').split(';')[0];
+    const blob=new Blob(chunks,{type});
+    $('#saveMsg').textContent='アップロード中…';
+    const err=await uploadClip(blob,type,ts);
+    $('#saveMsg').className=err?'msg':'msg ok';
+    $('#saveMsg').textContent=err||`保存しました(${subject} ${fmtMin(Number($('#minutes').value))})`;
+    if(!err){$('#banner').style.display='none';scheduleRemind()}
+    busy=false;updateRecBtn();
+  };
+  mr.start();
+  $('#recMark').style.display='block';
+  const c=$('#count');c.style.display='flex';c.textContent='2';
+  setTimeout(()=>{c.textContent='1'},1000);
+  setTimeout(()=>{if(mr.state!=='inactive')mr.stop()},2000);
+}
+$('#rec').onclick=record;
+
+async function uploadClip(blob,type,ts){
+  const ext=type.includes('mp4')?'mp4':'webm';
+  const path=`${me.id}/${ts}.${ext}`;
+  const up=await sb.storage.from('clips').upload(path,blob,{contentType:type,upsert:false});
+  if(up.error)return '動画を送れませんでした。電波を確認してもう一度撮ってください';
+  const ins=await sb.from('clips').insert({user_id:me.id,ts:new Date(ts).toISOString(),day_key:dayKey(ts),subject,minutes:Number($('#minutes').value),path});
+  if(ins.error){await sb.storage.from('clips').remove([path]);return '記録を保存できませんでした'}
+  return '';
+}
+
+/* ---------- 1日分の表示(じぶん・グループ共通) ---------- */
+async function fetchDay(key,userIds){
+  const {data,error}=await sb.from('clips').select('id,user_id,ts,subject,minutes,path').eq('day_key',key).in('user_id',userIds).order('ts');
+  if(error||!data)return [];
+  if(data.length){
+    const {data:signed}=await sb.storage.from('clips').createSignedUrls(data.map(c=>c.path),3600);
+    const map={};(signed||[]).forEach(s=>{if(s.signedUrl)map[s.path]=s.signedUrl});
+    data.forEach(c=>c.url=map[c.path]);
+  }
+  return data.filter(c=>c.url);
+}
+
+function renderDay(box,clips,names){
+  box.innerHTML='';
+  const isGroup=!!names;
+  const total=clips.reduce((s,c)=>s+c.minutes,0);
+  const by={};clips.forEach(c=>{const k=isGroup?(names[c.user_id]||'?'):c.subject;by[k]=(by[k]||0)+c.minutes});
+  const t=document.createElement('div');t.className='totals';
+  const m=document.createElement('div');m.className='tot main';m.textContent=(isGroup?'みんなで ':'合計 ')+fmtMin(total);t.appendChild(m);
+  Object.entries(by).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{const d=document.createElement('div');d.className='tot';d.textContent=`${k} ${fmtMin(v)}`;t.appendChild(d)});
+  box.appendChild(t);
+  if(!clips.length){const e=document.createElement('div');e.className='empty';e.textContent='この日の記録はまだありません';box.appendChild(e);return}
+
+  const play=document.createElement('button');play.className='big main';play.style.marginTop='0';
+  play.textContent=isGroup?'みんなの1日を続けて再生':'この日を続けて再生';
+  const pw=document.createElement('div');pw.className='pwrap hidden';
+  const v=document.createElement('video');v.playsInline=true;v.muted=true;v.controls=true;
+  const ov=document.createElement('div');ov.className='ov';
+  pw.append(v,ov);
+  play.onclick=()=>{
+    show(pw,true);let i=0;
+    const next=()=>{
+      if(i>=clips.length){ov.textContent='おわり';return}
+      const c=clips[i];v.src=c.url;
+      ov.textContent=`${i+1}/${clips.length}  ${fmtTime(c.ts)}  ${isGroup?(names[c.user_id]||'')+' ・ ':''}${c.subject}`;
+      v.play().catch(()=>{});
+    };
+    v.onended=()=>{i++;next()};
+    v.onerror=()=>{i++;next()};
+    next();pw.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  box.append(play,pw);
+
+  const g=document.createElement('div');g.className='grid';
+  clips.forEach(c=>{
+    const el=document.createElement('div');el.className='th';
+    const vv=document.createElement('video');vv.src=c.url+'#t=0.1';vv.preload='metadata';vv.muted=true;vv.playsInline=true;
+    const cap=document.createElement('div');cap.className='cap';
+    cap.textContent=`${fmtTime(c.ts)} ${c.subject}`+(isGroup?`\n${names[c.user_id]||''}`:'');
+    cap.style.whiteSpace='pre-line';
+    el.append(vv,cap);
+    if(c.user_id===me.id){
+      const x=document.createElement('button');x.className='x';x.textContent='×';
+      x.onclick=async()=>{
+        if(!confirm('この2秒を消しますか?'))return;
+        await sb.from('clips').delete().eq('id',c.id);
+        await sb.storage.from('clips').remove([c.path]);
+        isGroup?renderGroupDay():renderMine();
+      };
+      el.appendChild(x);
+    }
+    g.appendChild(el);
+  });
+  box.appendChild(g);
+  const n=document.createElement('div');n.className='note';n.textContent='1日は朝4時から翌朝4時まで。×は自分の動画だけ消せます。';box.appendChild(n);
+}
+
+/* ---------- じぶん ---------- */
+let mKey=dayKey(Date.now());
+async function renderMine(){
+  $('#mDay').textContent=labelOf(mKey);$('#mNext').disabled=mKey>=dayKey(Date.now());
+  $('#mBody').innerHTML='<div class="empty">読み込み中…</div>';
+  const k=mKey;const clips=await fetchDay(k,[me.id]);
+  if(k===mKey)renderDay($('#mBody'),clips,null);
+}
+$('#mPrev').onclick=()=>{mKey=shiftKey(mKey,-1);renderMine()};
+$('#mNext').onclick=()=>{if(mKey<dayKey(Date.now())){mKey=shiftKey(mKey,1);renderMine()}};
+
+/* ---------- グループ ---------- */
+let groups=[],curGroup=null,members=[],names={},gKey=dayKey(Date.now());
+function gmsg(t,ok){$('#gMsg').className=ok?'msg ok':'msg';$('#gMsg').textContent=t||''}
+async function loadGroups(){
+  const {data}=await sb.from('groups').select('id,name,code,created_at').order('created_at');
+  groups=data||[];
+  if(curGroup&&!groups.find(g=>g.id===curGroup.id))curGroup=null;
+  if(!curGroup){const saved=lsGet('sl_group',null);curGroup=groups.find(g=>g.id===saved)||groups[0]||null}
+  renderGroupList();
+  if(curGroup)selectGroup(curGroup);else{show($('#gDetail'),false);show($('#gDay'),false)}
+}
+function renderGroupList(){
+  const box=$('#gList');box.innerHTML='';
+  show($('#gEmpty'),!groups.length);
+  groups.forEach(g=>{
+    const b=document.createElement('button');b.className='gitem'+(curGroup&&curGroup.id===g.id?' on':'');
+    const n=document.createElement('b');n.textContent=g.name;
+    const s=document.createElement('span');s.style.cssText='font-size:12px;color:var(--sub)';s.textContent='見る ›';
+    b.append(n,s);b.onclick=()=>selectGroup(g);box.appendChild(b);
+  });
+}
+async function selectGroup(g){
+  curGroup=g;lsSet('sl_group',g.id);renderGroupList();
+  $('#gName').textContent=g.name;$('#gCode').textContent=g.code;
+  show($('#gDetail'),true);show($('#gDay'),true);
+  const {data:mem}=await sb.from('group_members').select('user_id').eq('group_id',g.id);
+  members=(mem||[]).map(m=>m.user_id);
+  const {data:profs}=await sb.from('profiles').select('id,name').in('id',members.length?members:[me.id]);
+  names={};(profs||[]).forEach(p=>names[p.id]=p.name);
+  const mb=$('#gMembers');mb.innerHTML='';
+  members.forEach(id=>{const s=document.createElement('span');s.className='mem';s.textContent=(names[id]||'?')+(id===me.id?'(自分)':'');mb.appendChild(s)});
+  renderGroupDay();
+}
+async function renderGroupDay(){
+  if(!curGroup)return;
+  $('#gDayLabel').textContent=labelOf(gKey);$('#gNext').disabled=gKey>=dayKey(Date.now());
+  $('#gBody').innerHTML='<div class="empty">読み込み中…</div>';
+  const k=gKey,gid=curGroup.id;
+  const clips=await fetchDay(k,members.length?members:[me.id]);
+  if(k===gKey&&curGroup&&gid===curGroup.id)renderDay($('#gBody'),clips,names);
+}
+$('#gPrev').onclick=()=>{gKey=shiftKey(gKey,-1);renderGroupDay()};
+$('#gNext').onclick=()=>{if(gKey<dayKey(Date.now())){gKey=shiftKey(gKey,1);renderGroupDay()}};
+
+$('#createBtn').onclick=async()=>{
+  const name=$('#newGroup').value.trim();if(!name){gmsg('グループ名を入れてください');return}
+  const {data,error}=await sb.rpc('create_group',{gname:name});
+  if(error){gmsg('作れませんでした');return}
+  $('#newGroup').value='';gmsg(`「${data.name}」を作りました。招待コードを友達に送りましょう`,true);
+  curGroup=data;await loadGroups();
+};
+$('#joinBtn').onclick=async()=>{
+  const code=$('#joinCode').value.trim().toUpperCase();if(code.length!==6){gmsg('招待コードは6文字です');return}
+  const {data,error}=await sb.rpc('join_group',{gcode:code});
+  if(error){gmsg(/not_found/.test(error.message)?'そのコードのグループは見つかりません':/group_full/.test(error.message)?'このグループは満員です(20人まで)':'参加できませんでした');return}
+  $('#joinCode').value='';gmsg(`「${data.name}」に参加しました`,true);
+  if(joinFromUrl)history.replaceState(null,'',location.pathname);
+  curGroup=data;await loadGroups();
+};
+$('#shareBtn').onclick=async()=>{
+  if(!curGroup)return;
+  const url=location.origin+location.pathname+'?join='+curGroup.code;
+  const text=`スタログのグループ「${curGroup.name}」で一緒に勉強しよう!\n招待コード:${curGroup.code}\n${url}`;
+  try{if(navigator.share){await navigator.share({text});return}}catch(e){if(e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(text);gmsg('招待メッセージをコピーしました。LINEなどに貼り付けて送ってください',true)}
+  catch(e){prompt('これをコピーして送ってください',text)}
+};
+$('#leaveBtn').onclick=async()=>{
+  if(!curGroup||!confirm(`「${curGroup.name}」を抜けますか?`))return;
+  await sb.from('group_members').delete().eq('group_id',curGroup.id).eq('user_id',me.id);
+  curGroup=null;lsSet('sl_group',null);gmsg('グループを抜けました',true);loadGroups();
+};
+
+/* ---------- 1時間ごとのお知らせ ---------- */
+let timer=null;
+function scheduleRemind(){
+  clearTimeout(timer);
+  if(!$('#remind').checked)return;
+  timer=setTimeout(()=>{
+    $('#banner').style.display='block';
+    try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}
+    try{if('Notification' in window&&Notification.permission==='granted')new Notification('スタログ',{body:'いまの勉強を2秒撮りましょう'})}catch(e){}
+    scheduleRemind();
+  },60*60*1000);
+}
+$('#remind').checked=lsGet('sl_remind',false);
+$('#remind').onchange=()=>{
+  lsSet('sl_remind',$('#remind').checked);
+  if($('#remind').checked&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}
+  scheduleRemind();
+};
+
+renderSubjects();updateRecBtn();scheduleRemind();
+</script>
+</body>
+</html>
