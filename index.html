@@ -735,6 +735,25 @@ $('#remind').onchange=()=>{
   scheduleRemind();
 };
 
+/* ---------- 新しい版が出たら自動で切り替える ---------- */
+// ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
+// 中身を変えたら APP_VERSION の値も必ず変える。
+const APP_VERSION='2026-10-18b';
+async function checkUpdate(){
+  try{
+    const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
+    const m=(await r.text()).match(/const APP_VERSION='([^']+)'/);
+    if(!m||m[1]===APP_VERSION)return;
+    if(sessionStorage.getItem('sl_reloaded')===m[1])return;   // 何度も読み直さない
+    sessionStorage.setItem('sl_reloaded',m[1]);
+    const q=new URLSearchParams(location.search);q.set('v',m[1]);
+    location.replace(location.pathname+'?'+q.toString());
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});
+window.addEventListener('pageshow',e=>{if(e.persisted)checkUpdate()});
+checkUpdate();
+
 renderSubjects();updateRecBtn();scheduleRemind();
 </script>
 </body>
