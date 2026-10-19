@@ -217,6 +217,7 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .rk-min{font-weight:800;font-variant-numeric:tabular-nums}
 .rk-gap{text-align:center;color:var(--sub);font-size:12px;letter-spacing:.3em}
 .rk-p{font-size:14px;color:var(--sub);line-height:1.7;margin:0}
+.forgot-note{font-size:14px;color:var(--sub);margin:14px 0 0;line-height:1.6}
 label.sw{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub)}
 label.sw input{width:20px;height:20px;accent-color:var(--main)}
 </style>
@@ -244,12 +245,30 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
     </div>
     <label class="f" for="aEmail">メールアドレス</label>
     <input id="aEmail" name="email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required>
-    <label class="f" for="aPass">パスワード(6文字以上)</label>
-    <input id="aPass" name="password" type="password" autocomplete="current-password" minlength="6" required>
-    <label class="sw" style="margin-top:10px"><input type="checkbox" id="aShow">パスワードを表示</label>
+    <div id="passWrap">
+      <label class="f" for="aPass">パスワード(6文字以上)</label>
+      <input id="aPass" name="password" type="password" autocomplete="current-password" minlength="6" required>
+      <label class="sw" style="margin-top:10px"><input type="checkbox" id="aShow">パスワードを表示</label>
+    </div>
+    <p class="forgot-note hidden" id="forgotNote">登録したメールアドレスに、パスワードを決め直すためのリンクを送ります。</p>
     <button type="submit" class="big main" id="aGo">ログイン</button>
   </form>
   <div class="msg" id="aMsg"></div>
+  <div class="row" style="justify-content:center"><button type="button" class="link" id="forgotBtn">パスワードを忘れた場合</button></div>
+</section>
+
+<!-- パスワードの決め直し(メールのリンクから来たとき) -->
+<section class="card hidden" id="resetView">
+  <h2>新しいパスワードを決める</h2>
+  <form id="resetForm" autocomplete="on">
+    <input type="email" name="email" id="rEmail" autocomplete="username" hidden>
+    <label class="f" for="rPass">新しいパスワード(6文字以上)</label>
+    <input id="rPass" type="password" autocomplete="new-password" minlength="6" required>
+    <label class="f" for="rPass2">もう一度</label>
+    <input id="rPass2" type="password" autocomplete="new-password" minlength="6" required>
+    <button type="submit" class="big main" id="rGo">このパスワードにする</button>
+  </form>
+  <div class="msg" id="rMsg"></div>
 </section>
 
 <main id="appView" class="hidden">
@@ -441,7 +460,35 @@ let me=null,myName='';
 
 const joinFromUrl=new URLSearchParams(location.search).get('join');
 
-sb.auth.onAuthStateChange((_e,session)=>{setTimeout(()=>onSession(session),0)});
+// メールの再設定リンクから来たときは、先に新しいパスワードを決めてもらう
+let recovering=/type=recovery/.test(location.hash);
+// 再設定リンクの期限切れなどで戻ってきたとき
+if(/error_code=/.test(location.hash)){
+  setTimeout(()=>{setMode('forgot');$('#aMsg').className='msg';$('#aMsg').textContent='リンクの期限が切れているか、もう使われています。もう一度メールを送ってください'},0);
+  history.replaceState(null,'',location.pathname);
+}
+sb.auth.onAuthStateChange((ev,session)=>{
+  if(ev==='PASSWORD_RECOVERY')recovering=true;
+  setTimeout(()=>recovering&&session?showReset(session):onSession(session),0);
+});
+function showReset(session){
+  show($('#authView'),false);show($('#appView'),false);show($('#tabs'),false);show($('#meBox'),false);
+  $('#rEmail').value=session.user.email||'';
+  show($('#resetView'),true);
+}
+$('#resetForm').onsubmit=async e=>{
+  e.preventDefault();
+  const a=$('#rPass').value,b=$('#rPass2').value,m=$('#rMsg');m.className='msg';
+  if(a.length<6){m.textContent='パスワードは6文字以上にしてください';return}
+  if(a!==b){m.textContent='2つのパスワードが同じになっていません';return}
+  $('#rGo').disabled=true;
+  const {error}=await sb.auth.updateUser({password:a});
+  $('#rGo').disabled=false;
+  if(error){m.textContent=/different|same/i.test(error.message)?'前と違うパスワードにしてください':'変えられませんでした。メールのリンクからもう一度やり直してください';return}
+  recovering=false;history.replaceState(null,'',location.pathname);
+  show($('#resetView'),false);
+  const {data}=await sb.auth.getSession();onSession(data.session);
+};
 let started=false;
 async function onSession(session){
   if(!session){
@@ -469,14 +516,19 @@ async function ensureProfile(){
 let mode='login';
 function setMode(m){
   mode=m;
-  $('#tLogin').classList.toggle('on',m==='login');$('#tSignup').classList.toggle('on',m==='signup');
+  $('#tLogin').classList.toggle('on',m!=='signup');$('#tSignup').classList.toggle('on',m==='signup');
   show($('#nameWrap'),m==='signup');
-  $('#aGo').textContent=m==='login'?'ログイン':'登録する';
+  show($('#passWrap'),m!=='forgot');$('#aPass').required=m!=='forgot';
+  show($('#forgotNote'),m==='forgot');
+  $('#forgotBtn').textContent=m==='forgot'?'ログインにもどる':'パスワードを忘れた場合';
+  show($('#forgotBtn').parentNode,m!=='signup');
+  $('#aGo').textContent=m==='login'?'ログイン':m==='forgot'?'再設定のメールを送る':'登録する';
   $('#aPass').autocomplete=m==='login'?'current-password':'new-password';
   $('#aMsg').textContent='';
 }
 $('#tLogin').onclick=()=>setMode('login');
 $('#tSignup').onclick=()=>setMode('signup');
+$('#forgotBtn').onclick=()=>setMode(mode==='forgot'?'login':'forgot');
 $('#aShow').onchange=()=>{$('#aPass').type=$('#aShow').checked?'text':'password'};
 $('#authForm').onsubmit=async e=>{
   e.preventDefault();
@@ -484,6 +536,16 @@ $('#authForm').onsubmit=async e=>{
   $('#aShow').checked=false;$('#aPass').type='password';
   const email=$('#aEmail').value.trim(),password=$('#aPass').value,name=$('#aName').value.trim();
   const m=$('#aMsg');m.className='msg';m.textContent='';
+  if(mode==='forgot'){
+    if(!email){m.textContent='メールアドレスを入れてください';return}
+    $('#aGo').disabled=true;
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+    $('#aGo').disabled=false;
+    if(error&&/rate|seconds|many/i.test(error.message)){m.textContent='少し時間をおいてから、もう一度送ってください';return}
+    // 登録があるかどうかは知らせない(他人のメールアドレスを調べられないように)
+    m.className='msg ok';m.textContent='このメールアドレスで登録していれば、再設定のメールが届きます。メールのリンクを押してください(迷惑メールも確認してください)';
+    return;
+  }
   if(!email||!password){m.textContent='メールアドレスとパスワードを入れてください';return}
   if(mode==='signup'&&!name){m.textContent='表示名を入れてください';return}
   $('#aGo').disabled=true;
@@ -1242,7 +1304,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-19f';
+const APP_VERSION='2026-10-19g';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
