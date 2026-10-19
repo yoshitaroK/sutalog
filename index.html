@@ -403,7 +403,7 @@ sb.auth.onAuthStateChange((_e,session)=>{setTimeout(()=>onSession(session),0)});
 let started=false;
 async function onSession(session){
   if(!session){
-    me=null;started=false;
+    leaveLive();me=null;started=false;
     show($('#authView'),true);show($('#appView'),false);show($('#tabs'),false);show($('#meBox'),false);
     return;
   }
@@ -542,7 +542,7 @@ function record(){
     const err=await uploadClip(blob,type,ts);
     $('#saveMsg').className=err?'msg':'msg ok';
     $('#saveMsg').textContent=err||`保存しました(${subject} ${fmtMin(Number($('#minutes').value))})`;
-    if(!err){$('#banner').style.display='none';scheduleRemind();tAfterRecord();renderShootLive()}
+    if(!err){$('#banner').style.display='none';scheduleRemind();tAfterRecord();renderShootLive(true)}
     busy=false;updateRecBtn();
   };
   mr.start();
@@ -735,7 +735,10 @@ async function renderGroupLive(){
   });
 }
 // 撮るタブ:選んでいるグループで、自分以外に勉強中の人がいたら知らせる
-async function renderShootLive(){
+let shootLiveAt=0;
+async function renderShootLive(force){
+  if(!force&&Date.now()-shootLiveAt<5000)return;
+  shootLiveAt=Date.now();
   const el=$('#liveShoot');
   const {data:gs}=await sb.from('groups').select('id,name').order('created_at');
   if(!gs||!gs.length){show(el,false);return}
@@ -788,6 +791,8 @@ function renderChat(stick){
         if(line.querySelector('.msg-del'))return;
         const del=document.createElement('button');del.type='button';del.className='msg-del';del.textContent='消す';
         del.onclick=async()=>{
+          const short=m.body.length>40?m.body.slice(0,40)+'…':m.body;
+          if(!await askConfirm({title:'このメッセージを消しますか?',body:`「${short}」\nグループのみんなの画面からも消えます。`,ok:'消す',icon:'💬'}))return;
           const {error}=await sb.from('messages').delete().eq('id',m.id);
           if(!error){chatMsgs=chatMsgs.filter(x=>x.id!==m.id);renderChat()}
         };
@@ -924,7 +929,12 @@ $('#tReset').onclick=async()=>{
   timer={start:null,acc:0};tSave();setMinutes(lsGet('sl_minutes_manual',60));
 };
 // 撮って保存できたら、次の区切りに向けて0から測り直す(計測中ならそのまま進む)
-function tAfterRecord(){if(!tActive())return;timer={start:timer.start!==null?Date.now():null,acc:0};tSave()}
+function tAfterRecord(){
+  if(!tActive())return;
+  const running=timer.start!==null;
+  timer={start:running?Date.now():null,acc:0};tSave();
+  if(!running)setMinutes(lsGet('sl_minutes_manual',60));
+}
 setInterval(()=>{if(timer.start!==null&&!document.hidden)paintTimer()},1000);
 
 /* ---------- いま勉強中:タイマー中の人をリアルタイムで共有 ---------- */
@@ -951,6 +961,9 @@ function syncPresence(){
       else ch.untrack();
     }catch(e){}
   });
+}
+function leaveLive(){
+  Object.keys(liveCh).forEach(id=>{try{liveCh[id].untrack();sb.removeChannel(liveCh[id])}catch(e){}delete liveCh[id];delete livePres[id]});
 }
 const presOf=gid=>(livePres[gid]||[]).filter(p=>p&&p.user_id);
 
@@ -1063,7 +1076,7 @@ $('#createBtn').onclick=async()=>{
   const {data,error}=await sb.rpc('create_group',{gname:name});
   if(error){gmsg('作れませんでした');return}
   $('#newGroup').value='';gmsg(`「${data.name}」を作りました。招待コードを友達に送りましょう`,true);
-  curGroup=data;await loadGroups();
+  curGroup=data;await loadGroups();joinLive();
 };
 $('#joinBtn').onclick=async()=>{
   const code=$('#joinCode').value.trim().toUpperCase();if(code.length!==6){gmsg('招待コードは6文字です');return}
@@ -1071,7 +1084,7 @@ $('#joinBtn').onclick=async()=>{
   if(error){gmsg(/not_found/.test(error.message)?'そのコードのグループは見つかりません':/group_full/.test(error.message)?'このグループは満員です(20人まで)':'参加できませんでした');return}
   $('#joinCode').value='';gmsg(`「${data.name}」に参加しました`,true);
   if(joinFromUrl)history.replaceState(null,'',location.pathname);
-  curGroup=data;await loadGroups();
+  curGroup=data;await loadGroups();joinLive();
 };
 $('#shareBtn').onclick=async()=>{
   if(!curGroup)return;
@@ -1125,7 +1138,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-19d';
+const APP_VERSION='2026-10-19e';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
