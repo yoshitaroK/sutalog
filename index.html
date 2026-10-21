@@ -165,6 +165,59 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 @keyframes mfade{from{opacity:0}}
 @keyframes mpop{from{transform:scale(.94);opacity:0}}
 @media (prefers-reduced-motion:reduce){.modal,.modal-card{animation:none}}
+/* 勉強タイマー */
+.tm-head{display:flex;align-items:center;justify-content:space-between}
+.tm-head h2{margin:0}
+.tm-state{font-size:12px;font-weight:800;color:var(--sub);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.timer.run .tm-state{color:var(--main-ink);background:var(--main);border-color:var(--main)}
+.timer.pause .tm-state{color:#ffd27a;border-color:rgba(255,190,60,.5)}
+.tm-clock{font-size:56px;font-weight:800;text-align:center;letter-spacing:.02em;font-variant-numeric:tabular-nums;margin:10px 0 2px;color:var(--sub)}
+.timer.run .tm-clock{color:var(--main);text-shadow:0 0 24px rgba(198,255,61,.35)}
+.timer.pause .tm-clock{color:var(--ink)}
+.tm-btns{display:flex;gap:8px}
+.tm-btns .big{margin-top:10px}
+.tm-sub{background:#0f1115;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.tm-lock-note{color:var(--main);font-weight:800;margin-left:6px}
+.locked{opacity:.4;pointer-events:none}
+/* 1週間のふりかえり */
+.wk-total{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.wk-total b{font-size:34px;font-weight:800;color:var(--main);font-variant-numeric:tabular-nums}
+.wk-total span{font-size:13px;font-weight:800;color:var(--sub)}
+.wk-total span.up{color:var(--main)}
+.wk-sub{font-size:13px;color:var(--sub);margin-top:2px}
+.wk-pick{margin-top:14px;font-size:13px;color:var(--sub);font-weight:700;min-height:1.4em}
+.wk-pick b{color:var(--ink);font-size:15px}
+.wk-chart{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;height:140px;margin-top:6px;border-bottom:1px solid var(--line)}
+.wk-col{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;border:0;background:none;padding:0 4px;height:100%;position:relative}
+.wk-col i{display:block;width:100%;max-width:30px;min-height:2px;border-radius:4px 4px 0 0;background:#2a2f38;transition:height .4s}
+.wk-col.has i{background:var(--main);opacity:.55}
+.wk-col.sel i{opacity:1;box-shadow:0 0 12px rgba(198,255,61,.4)}
+.wk-col:focus-visible{outline:2px solid var(--main);outline-offset:2px;border-radius:6px}
+.wk-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:6px}
+.wk-days span{text-align:center;font-size:11px;color:var(--sub);font-weight:700}
+.wk-days span.today{color:var(--ink)}
+.wk-h3{font-size:14px;margin:18px 0 8px;font-weight:800}
+.wk-row{display:grid;grid-template-columns:4.5em 1fr auto;align-items:center;gap:10px;padding:5px 0;font-size:14px}
+.wk-row b{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-row .bar{height:10px;border-radius:0 4px 4px 0;background:#1b1e25;overflow:hidden}
+.wk-row .bar i{display:block;height:100%;background:var(--main);border-radius:0 4px 4px 0}
+.wk-row span{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* ランキング */
+.tabs button{font-size:11px}
+.rk-me{margin:14px 0 6px}
+.rk-me .rk-row{border:1px solid var(--main);box-shadow:0 0 18px rgba(198,255,61,.15)}
+.rk-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.rk-row{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#0f1115;border:1px solid var(--line)}
+.rk-row.me{border-color:var(--main)}
+.rk-n{font-size:18px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;color:var(--sub)}
+.rk-row.top1 .rk-n{color:#ffd54a}.rk-row.top2 .rk-n{color:#d6dbe3}.rk-row.top3 .rk-n{color:#e0a36b}
+.rk-row.top1{background:linear-gradient(90deg,rgba(255,213,74,.12),#0f1115 60%)}
+.rk-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-name small{color:var(--main);font-size:11px;margin-left:6px}
+.rk-min{font-weight:800;font-variant-numeric:tabular-nums}
+.rk-gap{text-align:center;color:var(--sub);font-size:12px;letter-spacing:.3em}
+.rk-p{font-size:14px;color:var(--sub);line-height:1.7;margin:0}
+.forgot-note{font-size:14px;color:var(--sub);margin:14px 0 0;line-height:1.6}
 label.sw{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub)}
 label.sw input{width:20px;height:20px;accent-color:var(--main)}
 </style>
@@ -192,12 +245,30 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
     </div>
     <label class="f" for="aEmail">メールアドレス</label>
     <input id="aEmail" name="email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required>
-    <label class="f" for="aPass">パスワード(6文字以上)</label>
-    <input id="aPass" name="password" type="password" autocomplete="current-password" minlength="6" required>
-    <label class="sw" style="margin-top:10px"><input type="checkbox" id="aShow">パスワードを表示</label>
+    <div id="passWrap">
+      <label class="f" for="aPass">パスワード(6文字以上)</label>
+      <input id="aPass" name="password" type="password" autocomplete="current-password" minlength="6" required>
+      <label class="sw" style="margin-top:10px"><input type="checkbox" id="aShow">パスワードを表示</label>
+    </div>
+    <p class="forgot-note hidden" id="forgotNote">登録したメールアドレスに、パスワードを決め直すためのリンクを送ります。</p>
     <button type="submit" class="big main" id="aGo">ログイン</button>
   </form>
   <div class="msg" id="aMsg"></div>
+  <div class="row" style="justify-content:center"><button type="button" class="link" id="forgotBtn">パスワードを忘れた場合</button></div>
+</section>
+
+<!-- パスワードの決め直し(メールのリンクから来たとき) -->
+<section class="card hidden" id="resetView">
+  <h2>新しいパスワードを決める</h2>
+  <form id="resetForm" autocomplete="on">
+    <input type="email" name="email" id="rEmail" autocomplete="username" hidden>
+    <label class="f" for="rPass">新しいパスワード(6文字以上)</label>
+    <input id="rPass" type="password" autocomplete="new-password" minlength="6" required>
+    <label class="f" for="rPass2">もう一度</label>
+    <input id="rPass2" type="password" autocomplete="new-password" minlength="6" required>
+    <button type="submit" class="big main" id="rGo">このパスワードにする</button>
+  </form>
+  <div class="msg" id="rMsg"></div>
 </section>
 
 <main id="appView" class="hidden">
@@ -205,6 +276,16 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
   <!-- 撮る -->
   <div id="pShoot">
     <button type="button" class="live-banner hidden" id="liveShoot"></button>
+    <section class="card timer" id="timerCard">
+      <div class="tm-head"><h2>勉強タイマー</h2><span class="tm-state" id="tState">止まっています</span></div>
+      <div class="tm-clock" id="tClock" role="timer" aria-live="off">0:00:00</div>
+      <div class="tm-btns">
+        <button type="button" class="big main" id="tStart">スタート</button>
+        <button type="button" class="big tm-sub hidden" id="tPause">一時停止</button>
+        <button type="button" class="big tm-sub hidden" id="tReset">リセット</button>
+      </div>
+      <div class="note" id="tNote">勉強を始めるときに押してね。終わったら下の「2秒撮る」で、タイマーの時間がそのまま記録されます。</div>
+    </section>
     <section class="card">
       <h2>いま勉強していることを撮る</h2>
       <div class="cam">
@@ -222,9 +303,9 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
         <input id="newSub" placeholder="科目を追加" maxlength="12">
         <button class="ghost" id="addSub">追加</button>
       </div>
-      <label class="f" for="mH">勉強した時間</label>
+      <label class="f" for="mH">勉強した時間 <span class="tm-lock-note hidden" id="tLockNote">⏱ タイマーの時間が入ります</span></label>
       <div class="chips" id="mPresets"></div>
-      <div class="row tm">
+      <div class="row tm" id="mInputs">
         <input id="mH" type="number" inputmode="numeric" min="0" max="5" step="1" value="1" aria-label="時間"><span>時間</span>
         <input id="mM" type="number" inputmode="numeric" min="0" max="59" step="1" value="0" aria-label="分"><span>分</span>
         <input id="minutes" type="hidden" value="60">
@@ -238,6 +319,15 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
 
   <!-- じぶん -->
   <div id="pMine" class="hidden">
+    <section class="card week" id="weekCard">
+      <h2>この1週間</h2>
+      <div class="wk-total"><b id="wkTotal">0分</b><span id="wkDiff"></span></div>
+      <div class="wk-sub" id="wkAvg"></div>
+      <div class="wk-pick" id="wkPick"></div>
+      <div class="wk-chart" id="wkChart" role="img" aria-label="7日間の勉強時間"></div>
+      <h3 class="wk-h3">科目ごと</h3>
+      <div class="wk-subj" id="wkSubj"></div>
+    </section>
     <section class="card">
       <div class="nav"><button class="ghost" id="mPrev">◀</button><b id="mDay"></b><button class="ghost" id="mNext">▶</button></div>
       <div id="mBody"></div>
@@ -273,12 +363,38 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
     <section class="card hidden" id="gLive">
       <h2><span class="live-dot"></span>いま勉強中</h2>
       <div id="gLiveBody"></div>
-      <div class="note">1時間以内に撮った人が出ます</div>
+      <div class="note">タイマー中の人と、1時間以内に撮った人が出ます</div>
     </section>
 
     <section class="card hidden" id="gDay">
       <div class="nav"><button class="ghost" id="gPrev">◀</button><b id="gDayLabel"></b><button class="ghost" id="gNext">▶</button></div>
       <div id="gBody"></div>
+    </section>
+  </div>
+
+  <!-- ランキング -->
+  <div id="pRank" class="hidden">
+    <section class="card hidden" id="rkJoin">
+      <h2>ランキングに参加する</h2>
+      <p class="rk-p">全国のスタログ利用者に、ランキング用の名前と勉強時間が見えます。本名ではなくニックネームがおすすめです。動画や科目は見えません。</p>
+      <label class="f" for="rkName">ランキング用の名前(12文字まで)</label>
+      <input id="rkName" maxlength="12" placeholder="例:数学マスター" autocomplete="off">
+      <button type="button" class="big main" id="rkJoinBtn">参加する</button>
+      <div class="msg" id="rkMsg"></div>
+    </section>
+    <section class="card">
+      <h2>全国勉強時間ランキング</h2>
+      <div class="seg" id="rkSeg"><button type="button" data-r="today" class="on">今日</button><button type="button" data-r="week">この1週間</button></div>
+      <div id="rkMe" class="rk-me"></div>
+      <div id="rkList" class="rk-list"></div>
+      <div class="note">ランキングに出るのは「参加する」を選んだ人だけです。1本の記録で数えるのは、前に撮ってから実際にたった時間まで(その日の1本目は朝4時から)。</div>
+    </section>
+    <section class="card hidden" id="rkSet">
+      <h2>ランキングの設定</h2>
+      <label class="f" for="rkName2">ランキング用の名前</label>
+      <div class="row" style="margin-top:0"><input id="rkName2" maxlength="12" autocomplete="off"><button type="button" class="ghost" id="rkRename">変える</button></div>
+      <div class="row"><button type="button" class="link" id="rkLeave" style="color:var(--err)">ランキングへの参加をやめる</button></div>
+      <div class="msg" id="rkMsg2"></div>
     </section>
   </div>
 </main>
@@ -311,6 +427,7 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
   <button data-p="pShoot" class="on"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>撮る</button>
   <button data-p="pMine"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>じぶん</button>
   <button data-p="pGroup"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.5c3 0 5 2 5 4.5"/></svg></span>グループ</button>
+  <button data-p="pRank"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M10 17h4"/></svg></span>ランキング</button>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0/dist/umd/supabase.js"></script>
@@ -343,11 +460,39 @@ let me=null,myName='';
 
 const joinFromUrl=new URLSearchParams(location.search).get('join');
 
-sb.auth.onAuthStateChange((_e,session)=>{setTimeout(()=>onSession(session),0)});
+// メールの再設定リンクから来たときは、先に新しいパスワードを決めてもらう
+let recovering=/type=recovery/.test(location.hash);
+// 再設定リンクの期限切れなどで戻ってきたとき
+if(/error_code=/.test(location.hash)){
+  setTimeout(()=>{setMode('forgot');$('#aMsg').className='msg';$('#aMsg').textContent='リンクの期限が切れているか、もう使われています。もう一度メールを送ってください'},0);
+  history.replaceState(null,'',location.pathname);
+}
+sb.auth.onAuthStateChange((ev,session)=>{
+  if(ev==='PASSWORD_RECOVERY')recovering=true;
+  setTimeout(()=>recovering&&session?showReset(session):onSession(session),0);
+});
+function showReset(session){
+  show($('#authView'),false);show($('#appView'),false);show($('#tabs'),false);show($('#meBox'),false);
+  $('#rEmail').value=session.user.email||'';
+  show($('#resetView'),true);
+}
+$('#resetForm').onsubmit=async e=>{
+  e.preventDefault();
+  const a=$('#rPass').value,b=$('#rPass2').value,m=$('#rMsg');m.className='msg';
+  if(a.length<6){m.textContent='パスワードは6文字以上にしてください';return}
+  if(a!==b){m.textContent='2つのパスワードが同じになっていません';return}
+  $('#rGo').disabled=true;
+  const {error}=await sb.auth.updateUser({password:a});
+  $('#rGo').disabled=false;
+  if(error){m.textContent=/different|same/i.test(error.message)?'前と違うパスワードにしてください':'変えられませんでした。メールのリンクからもう一度やり直してください';return}
+  recovering=false;history.replaceState(null,'',location.pathname);
+  show($('#resetView'),false);
+  const {data}=await sb.auth.getSession();onSession(data.session);
+};
 let started=false;
 async function onSession(session){
   if(!session){
-    me=null;started=false;
+    leaveLive();me=null;started=false;
     show($('#authView'),true);show($('#appView'),false);show($('#tabs'),false);show($('#meBox'),false);
     return;
   }
@@ -357,7 +502,7 @@ async function onSession(session){
   $('#meName').textContent=myName;
   show($('#authView'),false);show($('#appView'),true);show($('#tabs'),true);show($('#meBox'),true);
   updateChatBadge();
-  renderShootLive();
+  renderShootLive();joinLive();
   if(joinFromUrl){$('#joinCode').value=joinFromUrl.toUpperCase();openTab('pGroup')}
 }
 async function ensureProfile(){
@@ -371,14 +516,19 @@ async function ensureProfile(){
 let mode='login';
 function setMode(m){
   mode=m;
-  $('#tLogin').classList.toggle('on',m==='login');$('#tSignup').classList.toggle('on',m==='signup');
+  $('#tLogin').classList.toggle('on',m!=='signup');$('#tSignup').classList.toggle('on',m==='signup');
   show($('#nameWrap'),m==='signup');
-  $('#aGo').textContent=m==='login'?'ログイン':'登録する';
+  show($('#passWrap'),m!=='forgot');$('#aPass').required=m!=='forgot';
+  show($('#forgotNote'),m==='forgot');
+  $('#forgotBtn').textContent=m==='forgot'?'ログインにもどる':'パスワードを忘れた場合';
+  show($('#forgotBtn').parentNode,m!=='signup');
+  $('#aGo').textContent=m==='login'?'ログイン':m==='forgot'?'再設定のメールを送る':'登録する';
   $('#aPass').autocomplete=m==='login'?'current-password':'new-password';
   $('#aMsg').textContent='';
 }
 $('#tLogin').onclick=()=>setMode('login');
 $('#tSignup').onclick=()=>setMode('signup');
+$('#forgotBtn').onclick=()=>setMode(mode==='forgot'?'login':'forgot');
 $('#aShow').onchange=()=>{$('#aPass').type=$('#aShow').checked?'text':'password'};
 $('#authForm').onsubmit=async e=>{
   e.preventDefault();
@@ -386,6 +536,16 @@ $('#authForm').onsubmit=async e=>{
   $('#aShow').checked=false;$('#aPass').type='password';
   const email=$('#aEmail').value.trim(),password=$('#aPass').value,name=$('#aName').value.trim();
   const m=$('#aMsg');m.className='msg';m.textContent='';
+  if(mode==='forgot'){
+    if(!email){m.textContent='メールアドレスを入れてください';return}
+    $('#aGo').disabled=true;
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+    $('#aGo').disabled=false;
+    if(error&&/rate|seconds|many/i.test(error.message)){m.textContent='少し時間をおいてから、もう一度送ってください';return}
+    // 登録があるかどうかは知らせない(他人のメールアドレスを調べられないように)
+    m.className='msg ok';m.textContent='このメールアドレスで登録していれば、再設定のメールが届きます。メールのリンクを押してください(迷惑メールも確認してください)';
+    return;
+  }
   if(!email||!password){m.textContent='メールアドレスとパスワードを入れてください';return}
   if(mode==='signup'&&!name){m.textContent='表示名を入れてください';return}
   $('#aGo').disabled=true;
@@ -406,9 +566,10 @@ $('#logout').onclick=()=>sb.auth.signOut();
 function openTab(p){
   rollDay();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
-  ['pShoot','pMine','pGroup'].forEach(id=>show($('#'+id),id===p));
+  ['pShoot','pMine','pGroup','pRank'].forEach(id=>show($('#'+id),id===p));
+  if(p==='pRank')renderRank();
   if(p==='pShoot'&&me)renderShootLive();
-  if(p==='pMine')renderMine();
+  if(p==='pMine'){renderMine();renderWeek()}
   if(p==='pGroup')loadGroups();
   window.scrollTo(0,0);
 }
@@ -422,7 +583,7 @@ function renderSubjects(){
   subjects.forEach(s=>{
     const b=document.createElement('button');
     b.className='chip'+(s===subject?' on':'');b.textContent=s;
-    b.onclick=()=>{subject=s;lsSet('sl_subject',s);renderSubjects();updateRecBtn()};
+    b.onclick=()=>{subject=s;lsSet('sl_subject',s);renderSubjects();updateRecBtn();syncPresence()};
     box.appendChild(b);
   });
 }
@@ -448,10 +609,10 @@ function setMinutes(total,fromInput){
 }
 PRESETS.forEach(m=>{
   const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.m=m;b.textContent=fmtMin(m);
-  b.onclick=()=>setMinutes(m);$('#mPresets').appendChild(b);
+  b.onclick=()=>{setMinutes(m);lsSet('sl_minutes_manual',m)};$('#mPresets').appendChild(b);
 });
 ['#mH','#mM'].forEach(q=>{
-  $(q).oninput=()=>setMinutes((Number($('#mH').value)||0)*60+(Number($('#mM').value)||0),true);
+  $(q).oninput=()=>{setMinutes((Number($('#mH').value)||0)*60+(Number($('#mM').value)||0),true);lsSet('sl_minutes_manual',Number($('#minutes').value))};
   $(q).onblur=()=>setMinutes(Number($('#minutes').value));
 });
 setMinutes(lsGet('sl_minutes',60));
@@ -486,7 +647,7 @@ function record(){
     const err=await uploadClip(blob,type,ts);
     $('#saveMsg').className=err?'msg':'msg ok';
     $('#saveMsg').textContent=err||`保存しました(${subject} ${fmtMin(Number($('#minutes').value))})`;
-    if(!err){$('#banner').style.display='none';scheduleRemind();renderShootLive()}
+    if(!err){$('#banner').style.display='none';scheduleRemind();tAfterRecord();renderShootLive(true)}
     busy=false;updateRecBtn();
   };
   mr.start();
@@ -661,31 +822,39 @@ async function fetchLive(userIds){
 const agoText=ts=>{const m=Math.max(0,Math.round((Date.now()-new Date(ts))/60e3));return m<1?'たった今':`${m}分前`};
 async function renderGroupLive(){
   if(!curGroup)return;
-  const gid=curGroup.id,list=await fetchLive(members);
+  const gid=curGroup.id,clips=await fetchLive(members);
   if(!curGroup||gid!==curGroup.id)return;
+  // タイマー中の人を先に、そのあと1時間以内に撮った人
+  const pres=presOf(gid),inPres=new Set(pres.map(p=>p.user_id));
+  const list=[...pres.map(p=>({user_id:p.user_id,name:p.name,subject:p.subject,timer:p.since})),...clips.filter(c=>!inPres.has(c.user_id))];
   const box=$('#gLiveBody');box.innerHTML='';
   show($('#gLive'),true);
-  if(!list.length){const e=document.createElement('div');e.className='empty';e.textContent='いまは誰も記録していません。最初の1本を撮ろう';box.appendChild(e);return}
+  if(!list.length){const e=document.createElement('div');e.className='empty';e.textContent='いまは誰も記録していません。タイマーをスタートしてみよう';box.appendChild(e);return}
   list.forEach(c=>{
     const r=document.createElement('div');r.className='live-row';
-    const n=document.createElement('b');n.textContent=(names[c.user_id]||'?')+(c.user_id===me.id?'(自分)':'');
-    const sj=document.createElement('span');sj.className='subj';sj.textContent=c.subject;
-    const a=document.createElement('span');a.className='sub';a.textContent=agoText(c.ts);
+    const n=document.createElement('b');n.textContent=(names[c.user_id]||c.name||'?')+(c.user_id===me.id?'(自分)':'');
+    const sj=document.createElement('span');sj.className='subj';sj.textContent=c.subject||'勉強';
+    const a=document.createElement('span');a.className='sub';
+    a.textContent=c.timer?`⏱ タイマー中 ${fmtMin(Math.max(1,Math.round((Date.now()-c.timer)/60e3)))}`:agoText(c.ts);
     r.append(n,sj,a);box.appendChild(r);
   });
 }
 // 撮るタブ:選んでいるグループで、自分以外に勉強中の人がいたら知らせる
-async function renderShootLive(){
+let shootLiveAt=0;
+async function renderShootLive(force){
+  if(!force&&Date.now()-shootLiveAt<5000)return;
+  shootLiveAt=Date.now();
   const el=$('#liveShoot');
   const {data:gs}=await sb.from('groups').select('id,name').order('created_at');
   if(!gs||!gs.length){show(el,false);return}
   const saved=lsGet('sl_group',null),g=gs.find(x=>x.id===saved)||gs[0];
   const {data:mem}=await sb.from('group_members').select('user_id').eq('group_id',g.id);
   const ids=(mem||[]).map(m=>m.user_id).filter(id=>id!==me.id);
-  const list=await fetchLive(ids);
+  const pres=presOf(g.id).filter(p=>p.user_id!==me.id),inPres=new Set(pres.map(p=>p.user_id));
+  const list=[...pres,...(await fetchLive(ids)).filter(c=>!inPres.has(c.user_id))];
   if(!list.length){show(el,false);return}
   const {data:profs}=await sb.from('profiles').select('id,name').in('id',list.map(c=>c.user_id));
-  const nm={};(profs||[]).forEach(p=>nm[p.id]=p.name);
+  const nm={};pres.forEach(p=>nm[p.user_id]=p.name);(profs||[]).forEach(p=>nm[p.id]=p.name);
   const who=list.slice(0,3).map(c=>nm[c.user_id]||'?').join('・')+(list.length>3?` ほか${list.length-3}人`:'');
   el.innerHTML='';
   const dot=document.createElement('span');dot.className='live-dot';
@@ -727,6 +896,8 @@ function renderChat(stick){
         if(line.querySelector('.msg-del'))return;
         const del=document.createElement('button');del.type='button';del.className='msg-del';del.textContent='消す';
         del.onclick=async()=>{
+          const short=m.body.length>40?m.body.slice(0,40)+'…':m.body;
+          if(!await askConfirm({title:'このメッセージを消しますか?',body:`「${short}」\nグループのみんなの画面からも消えます。`,ok:'消す',icon:'💬'}))return;
           const {error}=await sb.from('messages').delete().eq('id',m.id);
           if(!error){chatMsgs=chatMsgs.filter(x=>x.id!==m.id);renderChat()}
         };
@@ -833,6 +1004,182 @@ function askConfirm({title,body,ok='消す',icon='🗑️',video=null}){
   });
 }
 
+/* ---------- 勉強タイマー ---------- */
+// 開始時刻で計るので、アプリを閉じても止まらない
+let timer=lsGet('sl_timer',{start:null,acc:0});
+const tElapsed=()=>timer.acc+(timer.start?Date.now()-timer.start:0);
+const tActive=()=>timer.start!==null||timer.acc>0;
+function tSave(){lsSet('sl_timer',timer);paintTimer();syncPresence()}
+function fmtClock(ms){const s=Math.floor(ms/1000);return `${Math.floor(s/3600)}:${pad(Math.floor(s/60)%60)}:${pad(s%60)}`}
+function tMinutes(){const ms=tElapsed();return ms<30e3?0:Math.max(1,Math.round(ms/60e3))}
+function paintTimer(){
+  const run=timer.start!==null,act=tActive();
+  const card=$('#timerCard');card.classList.toggle('run',run);card.classList.toggle('pause',!run&&act);
+  $('#tClock').textContent=fmtClock(tElapsed());
+  $('#tState').textContent=run?'計測中':act?'一時停止中':'止まっています';
+  show($('#tStart'),!run);$('#tStart').textContent=act?'再開':'スタート';
+  show($('#tPause'),run);show($('#tReset'),act);
+  // タイマーを使っている間は、時間はタイマーから入れる
+  $('#mPresets').classList.toggle('locked',act);$('#mInputs').classList.toggle('locked',act);show($('#tLockNote'),act);
+  if(act){
+    const m=tMinutes();
+    if(Number($('#minutes').value)!==Math.min(300,m))setMinutes(m);
+    $('#tNote').textContent=tElapsed()>=300*60e3?'5時間までしか記録できないので、5時間として記録されます':'終わったら下の「2秒撮る」へ。撮るとタイマーは0から測り直します';
+  }else $('#tNote').textContent='勉強を始めるときに押してね。終わったら下の「2秒撮る」で、タイマーの時間がそのまま記録されます。';
+}
+$('#tStart').onclick=()=>{if(timer.start===null){timer.start=Date.now();tSave()}};
+$('#tPause').onclick=()=>{if(timer.start!==null){timer.acc+=Date.now()-timer.start;timer.start=null;tSave()}};
+$('#tReset').onclick=async()=>{
+  if(!await askConfirm({title:'タイマーを0に戻しますか?',body:`いまの ${fmtClock(tElapsed())} は記録されません。`,ok:'0に戻す',icon:'⏱'}))return;
+  timer={start:null,acc:0};tSave();setMinutes(lsGet('sl_minutes_manual',60));
+};
+// 撮って保存できたら、次の区切りに向けて0から測り直す(計測中ならそのまま進む)
+function tAfterRecord(){
+  if(!tActive())return;
+  const running=timer.start!==null;
+  timer={start:running?Date.now():null,acc:0};tSave();
+  if(!running)setMinutes(lsGet('sl_minutes_manual',60));
+}
+setInterval(()=>{if(timer.start!==null&&!document.hidden)paintTimer()},1000);
+
+/* ---------- いま勉強中:タイマー中の人をリアルタイムで共有 ---------- */
+const liveCh={},livePres={};
+async function joinLive(){
+  const {data:gs}=await sb.from('groups').select('id');
+  (gs||[]).forEach(g=>{
+    if(liveCh[g.id])return;
+    try{
+      const ch=sb.channel('live-'+g.id,{config:{presence:{key:me.id}}});
+      ch.on('presence',{event:'sync'},()=>{
+        livePres[g.id]=Object.values(ch.presenceState()).map(a=>a[0]).filter(Boolean);
+        if(!$('#pGroup').classList.contains('hidden')&&curGroup&&curGroup.id===g.id)renderGroupLive();
+        if(!$('#pShoot').classList.contains('hidden'))renderShootLive();
+      }).subscribe(st=>{if(st==='SUBSCRIBED')syncPresence()});
+      liveCh[g.id]=ch;
+    }catch(e){}
+  });
+}
+function syncPresence(){
+  Object.values(liveCh).forEach(ch=>{
+    try{
+      if(timer.start!==null&&me)ch.track({user_id:me.id,name:myName,subject:subject||'',since:Date.now()-tElapsed()});
+      else ch.untrack();
+    }catch(e){}
+  });
+}
+function leaveLive(){
+  Object.keys(liveCh).forEach(id=>{try{liveCh[id].untrack();sb.removeChannel(liveCh[id])}catch(e){}delete liveCh[id];delete livePres[id]});
+}
+const presOf=gid=>(livePres[gid]||[]).filter(p=>p&&p.user_id);
+
+/* ---------- 1週間のふりかえり ---------- */
+let wkSel=null;
+async function renderWeek(){
+  const today=dayKey(Date.now()),since=shiftKey(today,-13);
+  const {data}=await sb.from('clips').select('day_key,subject,minutes').eq('user_id',me.id).gte('day_key',since);
+  const rows=data||[],keys=[...Array(7)].map((_,i)=>shiftKey(today,i-6));
+  const byDay={};keys.forEach(k=>byDay[k]=0);
+  let total=0,prev=0;const bySub={};
+  rows.forEach(r=>{
+    if(r.day_key in byDay){byDay[r.day_key]+=r.minutes;total+=r.minutes;bySub[r.subject]=(bySub[r.subject]||0)+r.minutes}
+    else if(r.day_key<keys[0])prev+=r.minutes;
+  });
+  $('#wkTotal').textContent=fmtMin(total);
+  const d=total-prev,diff=$('#wkDiff');
+  diff.className=d>0?'up':'';
+  diff.textContent=prev===0&&total===0?'':d===0?'先週と同じ':`先週より ${d>0?'+':'−'}${fmtMin(Math.abs(d))}`;
+  const studied=keys.filter(k=>byDay[k]>0).length;
+  $('#wkAvg').textContent=`勉強した日 ${studied}/7日 ・ 1日平均 ${fmtMin(Math.round(total/7))}`;
+  // 棒グラフ(1本1日。高さは一番長い日に合わせる)
+  const max=Math.max(60,...keys.map(k=>byDay[k]));
+  if(!wkSel||!keys.includes(wkSel))wkSel=today;
+  const chart=$('#wkChart');chart.innerHTML='';
+  const days=document.createElement('div');days.className='wk-days';
+  const pick=()=>{const dt=keyToDate(wkSel);$('#wkPick').innerHTML='';const t=document.createElement('span');t.textContent=(wkSel===today?'今日':`${dt.getMonth()+1}/${dt.getDate()}(${'日月火水木金土'[dt.getDay()]})`)+' ';const b=document.createElement('b');b.textContent=byDay[wkSel]?fmtMin(byDay[wkSel]):'記録なし';$('#wkPick').append(t,b);
+    chart.querySelectorAll('.wk-col').forEach(c=>c.classList.toggle('sel',c.dataset.k===wkSel))};
+  keys.forEach(k=>{
+    const c=document.createElement('button');c.type='button';c.className='wk-col'+(byDay[k]?' has':'');c.dataset.k=k;
+    const dt=keyToDate(k);c.setAttribute('aria-label',`${dt.getMonth()+1}月${dt.getDate()}日 ${byDay[k]?fmtMin(byDay[k]):'記録なし'}`);
+    const bar=document.createElement('i');bar.style.height=(byDay[k]/max*100)+'%';c.appendChild(bar);
+    c.onclick=()=>{wkSel=k;pick()};chart.appendChild(c);
+    const l=document.createElement('span');l.textContent=k===today?'今日':'日月火水木金土'[dt.getDay()];if(k===today)l.className='today';days.appendChild(l);
+  });
+  const old=chart.nextElementSibling;if(old&&old.classList.contains('wk-days'))old.remove();
+  chart.after(days);pick();
+  // 科目ごと(長い順)
+  const box=$('#wkSubj');box.innerHTML='';
+  const subs=Object.entries(bySub).sort((a,b)=>b[1]-a[1]);
+  if(!subs.length){const e=document.createElement('div');e.className='empty';e.textContent='この1週間の記録はまだありません';box.appendChild(e);return}
+  subs.forEach(([k,v])=>{
+    const r=document.createElement('div');r.className='wk-row';
+    const n=document.createElement('b');n.textContent=k;
+    const bar=document.createElement('div');bar.className='bar';const f=document.createElement('i');f.style.width=(v/subs[0][1]*100)+'%';bar.appendChild(f);
+    const t=document.createElement('span');t.textContent=`${fmtMin(v)}(${Math.round(v/total*100)}%)`;
+    r.append(n,bar,t);box.appendChild(r);
+  });
+}
+
+/* ---------- 全国勉強時間ランキング ---------- */
+let rkPeriod='today',rkMine=null;
+document.querySelectorAll('#rkSeg button').forEach(b=>b.onclick=()=>{
+  rkPeriod=b.dataset.r;document.querySelectorAll('#rkSeg button').forEach(x=>x.classList.toggle('on',x===b));renderRank();
+});
+function rkRow(r){
+  const el=document.createElement('div');
+  el.className='rk-row'+(r.is_me?' me':'')+(r.rank<=3?' top'+r.rank:'');
+  const n=document.createElement('div');n.className='rk-n';n.textContent=r.rank<=3?['🥇','🥈','🥉'][r.rank-1]:r.rank;
+  const nm=document.createElement('div');nm.className='rk-name';nm.textContent=r.name;
+  if(r.is_me){const y=document.createElement('small');y.textContent='あなた';nm.appendChild(y)}
+  const m=document.createElement('div');m.className='rk-min';m.textContent=fmtMin(Number(r.minutes));
+  el.append(n,nm,m);return el;
+}
+async function renderRank(){
+  const list=$('#rkList'),meBox=$('#rkMe');
+  list.innerHTML='<div class="empty">読み込み中…</div>';meBox.innerHTML='';
+  const mine=await sb.rpc('my_ranking');
+  if(mine.error){list.innerHTML='';const e=document.createElement('div');e.className='empty';e.textContent='ランキングを使うには、Supabase に設定を足す必要があります';list.appendChild(e);show($('#rkJoin'),false);show($('#rkSet'),false);return}
+  rkMine=(mine.data&&mine.data[0])||{opt_in:false,rank_name:null};
+  show($('#rkJoin'),!rkMine.opt_in);show($('#rkSet'),rkMine.opt_in);
+  if(rkMine.opt_in)$('#rkName2').value=rkMine.rank_name||'';
+  const period=rkPeriod;
+  const {data,error}=await sb.rpc('get_ranking',{period});
+  if(period!==rkPeriod)return;
+  list.innerHTML='';
+  if(error){const e=document.createElement('div');e.className='empty';e.textContent='読み込めませんでした。少しあとで開き直してください';list.appendChild(e);return}
+  const rows=data||[];
+  const me=rows.find(r=>r.is_me);
+  if(rkMine.opt_in){
+    if(me)meBox.appendChild(rkRow(me));
+    else{const e=document.createElement('div');e.className='empty';e.textContent=rkPeriod==='today'?'今日の記録はまだありません。1本撮るとランキングに載ります':'この1週間の記録はまだありません';meBox.appendChild(e)}
+  }
+  const top=rows.filter(r=>Number(r.rank)<=50);
+  if(!top.length){const e=document.createElement('div');e.className='empty';e.textContent='まだ誰も載っていません。最初の1人になろう';list.appendChild(e);return}
+  top.forEach(r=>list.appendChild(rkRow(r)));
+  if(me&&Number(me.rank)>50){const g=document.createElement('div');g.className='rk-gap';g.textContent='・・・';list.appendChild(g);list.appendChild(rkRow(me))}
+}
+async function setRanking(opt,name,msgEl){
+  msgEl.className='msg';msgEl.textContent='';
+  const {error}=await sb.rpc('set_ranking',{opt,nm:name});
+  if(error){msgEl.textContent=/name_required/.test(error.message)?'ランキング用の名前を入れてください':/name_too_long/.test(error.message)?'名前は12文字までです':'うまくいきませんでした。もう一度試してください';return false}
+  return true;
+}
+$('#rkJoinBtn').onclick=async()=>{
+  const name=$('#rkName').value.trim();
+  if(!name){$('#rkMsg').className='msg';$('#rkMsg').textContent='ランキング用の名前を入れてください';return}
+  $('#rkJoinBtn').disabled=true;
+  const ok=await setRanking(true,name,$('#rkMsg'));
+  $('#rkJoinBtn').disabled=false;
+  if(ok)renderRank();
+};
+$('#rkRename').onclick=async()=>{
+  const name=$('#rkName2').value.trim();
+  if(await setRanking(true,name,$('#rkMsg2'))){$('#rkMsg2').className='msg ok';$('#rkMsg2').textContent='名前を変えました';renderRank()}
+};
+$('#rkLeave').onclick=async()=>{
+  if(!await askConfirm({title:'ランキングへの参加をやめますか?',body:'全国のランキングからあなたの名前と時間が消えます。記録や動画は消えません。いつでもまた参加できます。',ok:'やめる',icon:'🏆'}))return;
+  if(await setRanking(false,null,$('#rkMsg2')))renderRank();
+};
+
 /* ---------- じぶん ---------- */
 let mKey=dayKey(Date.now());
 async function renderMine(){
@@ -895,7 +1242,7 @@ $('#createBtn').onclick=async()=>{
   const {data,error}=await sb.rpc('create_group',{gname:name});
   if(error){gmsg('作れませんでした');return}
   $('#newGroup').value='';gmsg(`「${data.name}」を作りました。招待コードを友達に送りましょう`,true);
-  curGroup=data;await loadGroups();
+  curGroup=data;await loadGroups();joinLive();
 };
 $('#joinBtn').onclick=async()=>{
   const code=$('#joinCode').value.trim().toUpperCase();if(code.length!==6){gmsg('招待コードは6文字です');return}
@@ -903,7 +1250,7 @@ $('#joinBtn').onclick=async()=>{
   if(error){gmsg(/not_found/.test(error.message)?'そのコードのグループは見つかりません':/group_full/.test(error.message)?'このグループは満員です(20人まで)':'参加できませんでした');return}
   $('#joinCode').value='';gmsg(`「${data.name}」に参加しました`,true);
   if(joinFromUrl)history.replaceState(null,'',location.pathname);
-  curGroup=data;await loadGroups();
+  curGroup=data;await loadGroups();joinLive();
 };
 $('#shareBtn').onclick=async()=>{
   if(!curGroup)return;
@@ -921,11 +1268,11 @@ $('#leaveBtn').onclick=async()=>{
 };
 
 /* ---------- 1時間ごとのお知らせ ---------- */
-let timer=null;
+let remindTimer=null;
 function scheduleRemind(){
-  clearTimeout(timer);
+  clearTimeout(remindTimer);
   if(!$('#remind').checked)return;
-  timer=setTimeout(()=>{
+  remindTimer=setTimeout(()=>{
     $('#banner').style.display='block';
     try{navigator.vibrate&&navigator.vibrate(300)}catch(e){}
     try{if('Notification' in window&&Notification.permission==='granted')new Notification('スタログ',{body:'いまの勉強を2秒撮りましょう'})}catch(e){}
@@ -957,7 +1304,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-19c';
+const APP_VERSION='2026-10-19g';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
@@ -973,6 +1320,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdat
 window.addEventListener('pageshow',e=>{if(e.persisted)checkUpdate()});
 checkUpdate();
 
+paintTimer();
 renderSubjects();updateRecBtn();scheduleRemind();
 </script>
 </body>
