@@ -1389,7 +1389,7 @@ async function renderTnList(){
   if(!tnCur)return;
   const list=$('#tnList'),note=$('#tnNote'),tid=tnCur.id,tab=tnTab;
   list.innerHTML='<div class="empty">読み込み中…</div>';
-  show($('#tnMyGroups'),tab==='groups');
+  show($('#tnMyGroups'),false);
   if(tab==='people'){
     note.textContent='ランキングに参加している人が、ランキング用の名前で載ります。数え方はランキングと同じです。';
     const {data,error}=await sb.rpc('get_tournament_people',{tid});
@@ -1399,20 +1399,19 @@ async function renderTnList(){
     if(!data.length){const e=document.createElement('div');e.className='empty';e.textContent=rkMine&&!rkMine.opt_in?'下の「ランキングに参加する」から参加すると、個人の部に出られます':'まだ誰も記録していません。最初の1本を撮ろう';list.appendChild(e);return}
     data.forEach(r=>list.appendChild(rkRow(r)));
   }else{
-    note.textContent='「対抗戦に出る」にしたグループが、1人あたりの平均時間で競います。人数が多くても少なくても公平です。';
+    note.textContent='全部のグループが自動で出場します。メンバー全員の勉強時間の合計で競います。';
     const {data,error}=await sb.rpc('get_tournament_groups',{tid});
     if(tab!==tnTab||tid!==tnCur.id)return;
     list.innerHTML='';
     if(error){list.innerHTML='<div class="empty">読み込めませんでした</div>';return}
-    if(!data.length){const e=document.createElement('div');e.className='empty';e.textContent='まだ出ているグループはありません。下から自分のグループで出てみよう';list.appendChild(e)}
+    if(!data.length){const e=document.createElement('div');e.className='empty';e.textContent='まだ記録のあるグループはありません。最初の1本を撮ろう';list.appendChild(e)}
     data.forEach(r=>{
-      const el=rkRow({rank:Number(r.rank),name:r.name,minutes:r.avg_minutes,is_me:r.is_mine});
-      const sub=document.createElement('span');sub.className='rk-sub';sub.textContent=`${r.members}人 ・ 1人あたり`;
+      const el=rkRow({rank:Number(r.rank),name:r.name,minutes:r.total_minutes,is_me:r.is_mine});
+      const sub=document.createElement('span');sub.className='rk-sub';sub.textContent=`${r.members}人 ・ 合計`;
       el.querySelector('.rk-name').appendChild(sub);
       if(r.is_mine){const y=el.querySelector('.rk-name small');if(y)y.textContent='あなたのグループ'}
       list.appendChild(el);
     });
-    renderTnMyGroups();
   }
 }
 async function renderTnMyGroups(){
@@ -1591,7 +1590,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-21c';
+const APP_VERSION='2026-10-21d';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
