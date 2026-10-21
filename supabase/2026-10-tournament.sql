@@ -3,7 +3,7 @@
 --
 -- ・大会を開けるのは運営(app_admins に入っている人)だけ
 -- ・個人の部:ランキングに参加している人だけが、ランキング用の名前で載る
--- ・グループ対抗の部:全部のグループが自動で出る。メンバー全員の合計時間で順位を決める
+-- ・グループ対抗の部:「対抗戦に出る」にしたグループだけが出る。メンバー全員の合計時間で順位を決める
 -- ・数える時間はランキングと同じ(1本で数えるのは、前に撮ってから実際にたった時間まで)
 
 -- ========== 運営 ==========
@@ -102,7 +102,7 @@ language sql security definer set search_path = public stable as $$
   order by ranked.r, p.rank_name;
 $$;
 
--- グループ対抗の部(全グループ・合計時間。上位30グループと自分のグループ)
+-- グループ対抗の部(出ると決めたグループ・合計時間。上位30グループと自分のグループ)
 drop function if exists public.get_tournament_groups(bigint);
 create or replace function public.get_tournament_groups(tid bigint)
 returns table (rank bigint, name text, members bigint, total_minutes bigint, is_mine boolean)
@@ -116,9 +116,10 @@ language sql security definer set search_path = public stable as $$
     from public.groups gr
     join public.group_members gm on gm.group_id = gr.id
     left join cr on cr.user_id = gm.user_id
+    where gr.contest_opt_in
     group by gr.id, gr.name
   ),
-  ranked as (select g.*, rank() over (order by total_minutes desc) as r from g where total_minutes > 0)
+  ranked as (select g.*, rank() over (order by total_minutes desc) as r from g)
   select r, name, members, total_minutes, coalesce(is_mine, false)
   from ranked
   where r <= 30 or is_mine
