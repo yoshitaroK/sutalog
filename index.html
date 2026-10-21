@@ -242,6 +242,60 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .gd-btns{display:flex;gap:8px;margin-top:18px}
 .gd-btns .ghost{flex:0 0 92px;border-radius:16px;font-weight:800}
 .gd-btns .big{margin:0}
+/* 大会(赤ベースの特別デザイン) */
+.tn{--red:#ff2d46;--red2:#b3001b;--gold:#ffd54a;position:relative;overflow:hidden;border:1px solid rgba(255,45,70,.6);
+  background:radial-gradient(90% 60% at 50% 0%,rgba(255,45,70,.45),transparent 70%),linear-gradient(180deg,#3a0610 0%,#1a0307 55%,#120205 100%);
+  box-shadow:0 0 0 1px rgba(255,213,74,.15) inset,0 18px 50px rgba(179,0,27,.35)}
+.tn::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px)}
+.tn::after{content:"";position:absolute;left:-40%;top:0;width:40%;height:100%;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,255,255,.12),transparent);animation:tnshine 4.5s ease-in-out infinite}
+@keyframes tnshine{0%,60%{left:-40%}100%{left:140%}}
+@media (prefers-reduced-motion:reduce){.tn::after{animation:none;display:none}}
+.tn>*{position:relative}
+.tn-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tn-eyebrow{font-size:11px;font-weight:900;letter-spacing:.32em;color:var(--gold)}
+.tn-badge{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.06em;border-radius:99px;padding:4px 12px;background:var(--red);color:#fff;box-shadow:0 0 14px rgba(255,45,70,.7)}
+.tn-badge.soon{background:#3a0610;color:#ffc2ca;border:1px solid rgba(255,45,70,.6);box-shadow:none}
+.tn-badge.done{background:var(--gold);color:#2a1a00;box-shadow:0 0 14px rgba(255,213,74,.6)}
+.tn-trophy{font-size:54px;text-align:center;margin:8px 0 0;filter:drop-shadow(0 0 18px rgba(255,213,74,.55))}
+.tn-name{font-size:24px;font-weight:900;text-align:center;margin:4px 0 4px;line-height:1.35;text-wrap:balance;color:#fff;text-shadow:0 0 22px rgba(255,45,70,.8)}
+.tn-when{font-size:13px;color:#ffb3bd;font-weight:700;margin-bottom:14px;text-align:center}
+.tn-when b{color:var(--gold)}
+.tn .seg{margin-bottom:6px;background:rgba(0,0,0,.35);border-color:rgba(255,45,70,.35)}
+.tn .seg button{color:#ffb3bd}
+.tn .seg button.on{background:var(--red);color:#fff;box-shadow:0 0 14px rgba(255,45,70,.6)}
+.tn .rk-row{background:rgba(0,0,0,.35);border-color:rgba(255,45,70,.25)}
+.tn .rk-row.me{border-color:var(--gold);box-shadow:0 0 14px rgba(255,213,74,.25)}
+.tn .rk-row.top1{background:linear-gradient(90deg,rgba(255,213,74,.22),rgba(0,0,0,.35) 65%);border-color:rgba(255,213,74,.5)}
+.tn .rk-name small{color:var(--gold)}
+.tn .rk-min{color:#fff}
+.tn .note{color:#d98a95}
+.rk-row .rk-sub{display:block;font-size:11px;color:var(--sub);font-weight:700}
+.tn .rk-sub{color:#d98a95}
+.tn-my{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.tn-my h3{font-size:13px;color:#ffb3bd;margin:0}
+.tn-g{display:flex;align-items:center;gap:10px;justify-content:space-between;background:#0f1115;border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.tn .tn-g{background:rgba(0,0,0,.35);border-color:rgba(255,45,70,.25)}
+.tn-g b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tn-g button{flex:none}
+.tn .tn-g .ghost{background:transparent;border-color:rgba(255,45,70,.6);color:#fff}
+.tn .tn-g button.on{background:var(--red);border-color:var(--red);color:#fff}
+.tn-prize{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(90deg,rgba(255,213,74,.18),rgba(255,213,74,.06));border:1px solid rgba(255,213,74,.55);border-radius:14px;padding:10px 12px;margin:-4px 0 14px;font-size:14px;font-weight:800;color:#ffe58a;line-height:1.5}
+.tn-prize::before{content:"🎁";font-size:18px}
+/* 撮るタブの大会のお知らせ */
+.tn-banner{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,45,70,.6);
+  background:linear-gradient(90deg,#5a0716,#2a0409);color:#fff;font-size:14px;font-weight:800;text-align:left;box-shadow:0 8px 24px rgba(179,0,27,.3)}
+.tn-banner .ic{font-size:22px}
+.tn-banner .tx{min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.tn-banner .tx small{font-size:12px;color:#ffb3bd;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tn-banner .go{margin-left:auto;font-size:12px;color:#ffd54a;white-space:nowrap}
+.tn-admin-tag{font-size:11px;font-weight:800;color:var(--sub);border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+.tn-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tn-dates>div{min-width:0}
+.tn-dates input{min-width:0;width:100%;box-sizing:border-box}
+.tn-prize{display:flex;gap:10px;align-items:flex-start;background:rgba(255,213,74,.1);border:1px solid rgba(255,213,74,.45);border-radius:14px;padding:10px 12px;margin:-4px 0 14px;font-size:14px;font-weight:700;color:#ffe58a;line-height:1.5}
+.tn-prize::before{content:"🎁";font-size:18px}
+.tn-all{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.tn-all .tn-g span{font-size:12px;color:var(--sub)}
 label.sw{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub)}
 label.sw input{width:20px;height:20px;accent-color:var(--main)}
 </style>
@@ -299,6 +353,7 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
 
   <!-- 撮る -->
   <div id="pShoot">
+    <button type="button" class="tn-banner hidden" id="tnBanner"></button>
     <button type="button" class="live-banner hidden" id="liveShoot"></button>
     <section class="card timer" id="timerCard">
       <div class="tm-head"><h2>勉強タイマー</h2><span class="tm-state" id="tState">止まっています</span></div>
@@ -398,6 +453,17 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
 
   <!-- ランキング -->
   <div id="pRank" class="hidden">
+    <section class="card tn hidden" id="tnCard">
+      <div class="tn-top"><span class="tn-eyebrow">SUTALOG CUP</span><div class="tn-badge" id="tnBadge"></div></div>
+      <div class="tn-trophy" aria-hidden="true">🏆</div>
+      <h2 class="tn-name" id="tnName"></h2>
+      <div class="tn-when" id="tnWhen"></div>
+      <div class="tn-prize hidden" id="tnPrize"></div>
+      <div class="seg" id="tnSeg"><button type="button" data-t="people" class="on">個人の部</button><button type="button" data-t="groups">グループ対抗</button></div>
+      <div id="tnList" class="rk-list"></div>
+      <div id="tnMyGroups" class="tn-my hidden"></div>
+      <div class="note" id="tnNote"></div>
+    </section>
     <section class="card hidden" id="rkJoin">
       <h2>ランキングに参加する</h2>
       <p class="rk-p">全国のスタログ利用者に、ランキング用の名前と勉強時間が見えます。本名ではなくニックネームがおすすめです。動画や科目は見えません。</p>
@@ -412,6 +478,20 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
       <div id="rkMe" class="rk-me"></div>
       <div id="rkList" class="rk-list"></div>
       <div class="note">ランキングに出るのは「参加する」を選んだ人だけです。1本の記録で数えるのは、前に撮ってから実際にたった時間まで(その日の1本目は朝4時から)。</div>
+    </section>
+    <section class="card hidden" id="tnAdmin">
+      <h2>大会を開く <span class="tn-admin-tag">運営だけに表示</span></h2>
+      <label class="f" for="tnNewName">大会の名前(30文字まで)</label>
+      <input id="tnNewName" maxlength="30" placeholder="例:秋の勉強大会" autocomplete="off">
+      <label class="f" for="tnNewPrize">景品(なくてもOK・100文字まで)</label>
+      <input id="tnNewPrize" maxlength="100" placeholder="例:1位にAmazonギフト券500円分" autocomplete="off">
+      <div class="tn-dates">
+        <div><label class="f" for="tnStart">始まる日</label><input id="tnStart" type="date"></div>
+        <div><label class="f" for="tnEnd">終わる日</label><input id="tnEnd" type="date"></div>
+      </div>
+      <button type="button" class="big main" id="tnCreate">この大会を開く</button>
+      <div class="msg" id="tnMsg"></div>
+      <div id="tnAll" class="tn-all"></div>
     </section>
     <section class="card hidden" id="rkSet">
       <h2>ランキングの設定</h2>
@@ -564,7 +644,7 @@ async function onSession(session){
   $('#meName').textContent=myName;
   show($('#authView'),false);show($('#appView'),true);show($('#tabs'),true);show($('#meBox'),true);
   updateChatBadge();
-  renderShootLive();joinLive();
+  renderShootLive();joinLive();renderTnBanner();
   if(!lsGet('sl_guided',false))openGuide();
   if(joinFromUrl){$('#joinCode').value=joinFromUrl.toUpperCase();openTab('pGroup')}
 }
@@ -630,8 +710,8 @@ function openTab(p){
   rollDay();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
   ['pShoot','pMine','pGroup','pRank'].forEach(id=>show($('#'+id),id===p));
-  if(p==='pRank')renderRank();
-  if(p==='pShoot'&&me)renderShootLive();
+  if(p==='pRank'){renderRank();renderTournament()}
+  if(p==='pShoot'&&me){renderShootLive();renderTnBanner()}
   if(p==='pMine'){renderMine();renderWeek()}
   if(p==='pGroup')loadGroups();
   window.scrollTo(0,0);
@@ -1258,6 +1338,135 @@ $('#gdNext').onclick=()=>{if(gdStep<2)gdShow(gdStep+1);else{closeGuide();openTab
 $('#gdSkip').onclick=closeGuide;
 $('#guideOpen').onclick=openGuide;
 
+/* ---------- 大会(全国大会:個人の部+グループ対抗) ---------- */
+let tnCur=null,tnTab='people',tnAdmin=false;
+const tnDate=d=>{const x=new Date(d+'T00:00:00');return `${x.getMonth()+1}/${x.getDate()}(${'日月火水木金土'[x.getDay()]})`};
+const daysBetween=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);
+document.querySelectorAll('#tnSeg button').forEach(b=>b.onclick=()=>{
+  tnTab=b.dataset.t;document.querySelectorAll('#tnSeg button').forEach(x=>x.classList.toggle('on',x===b));renderTnList();
+});
+// 表示する大会:開催中 → これから(近い順) → 終わって14日以内
+function pickTournament(list){
+  const today=dayKey(Date.now());
+  const live=list.filter(t=>t.starts_on<=today&&today<=t.ends_on).sort((a,b)=>a.ends_on<b.ends_on?-1:1)[0];
+  if(live)return live;
+  const soon=list.filter(t=>t.starts_on>today).sort((a,b)=>a.starts_on<b.starts_on?-1:1)[0];
+  if(soon)return soon;
+  return list.filter(t=>t.ends_on<today&&daysBetween(t.ends_on,today)<=14).sort((a,b)=>a.ends_on<b.ends_on?1:-1)[0]||null;
+}
+async function renderTnBanner(){
+  const el=$('#tnBanner');
+  const {data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on').order('starts_on',{ascending:false}).limit(30);
+  const t=error?null:pickTournament(data||[]);const today=dayKey(Date.now());
+  if(!t||t.ends_on<today){show(el,false);return}
+  el.innerHTML='';
+  const ic=document.createElement('span');ic.className='ic';ic.textContent='🏆';
+  const tx=document.createElement('span');tx.className='tx';
+  const b=document.createElement('span');b.textContent=today<t.starts_on?`まもなく開催・あと${daysBetween(today,t.starts_on)}日`:`大会開催中・のこり${daysBetween(today,t.ends_on)}日`;
+  const sm=document.createElement('small');sm.textContent=t.name;tx.append(b,sm);
+  const go=document.createElement('span');go.className='go';go.textContent='順位を見る ›';
+  el.append(ic,tx,go);show(el,true);
+}
+$('#tnBanner').onclick=()=>openTab('pRank');
+async function renderTournament(){
+  let {data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on,prize').order('starts_on',{ascending:false}).limit(30);
+  if(error)({data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on').order('starts_on',{ascending:false}).limit(30));
+  if(error){show($('#tnCard'),false);show($('#tnAdmin'),false);return}   // Supabaseに設定が無いとき
+  const adm=await sb.rpc('is_app_admin');tnAdmin=!adm.error&&adm.data===true;
+  show($('#tnAdmin'),tnAdmin);if(tnAdmin)renderTnAdmin(data);
+  tnCur=pickTournament(data||[]);
+  show($('#tnCard'),!!tnCur);if(!tnCur)return;
+  const today=dayKey(Date.now()),b=$('#tnBadge');
+  $('#tnName').textContent=tnCur.name;
+  $('#tnPrize').textContent=tnCur.prize?`景品:${tnCur.prize}`:'';show($('#tnPrize'),!!tnCur.prize);
+  const span=`${tnDate(tnCur.starts_on)} 〜 ${tnDate(tnCur.ends_on)}`;
+  if(today<tnCur.starts_on){b.className='tn-badge soon';b.textContent='まもなく開催';$('#tnWhen').innerHTML=`${span} ・ 開始まで <b>あと${daysBetween(today,tnCur.starts_on)}日</b>`}
+  else if(today<=tnCur.ends_on){const n=daysBetween(today,tnCur.ends_on);b.className='tn-badge';b.textContent='開催中';$('#tnWhen').innerHTML=`${span} ・ ${n?`のこり <b>${n}日</b>`:'<b>今日まで!</b>'}`}
+  else{b.className='tn-badge done';b.textContent='結果発表';$('#tnWhen').textContent=`${span} ・ おつかれさまでした`}
+  renderTnList();
+}
+async function renderTnList(){
+  if(!tnCur)return;
+  const list=$('#tnList'),note=$('#tnNote'),tid=tnCur.id,tab=tnTab;
+  list.innerHTML='<div class="empty">読み込み中…</div>';
+  show($('#tnMyGroups'),tab==='groups');
+  if(tab==='people'){
+    note.textContent='ランキングに参加している人が、ランキング用の名前で載ります。数え方はランキングと同じです。';
+    const {data,error}=await sb.rpc('get_tournament_people',{tid});
+    if(tab!==tnTab||tid!==tnCur.id)return;
+    list.innerHTML='';
+    if(error){list.innerHTML='<div class="empty">読み込めませんでした</div>';return}
+    if(!data.length){const e=document.createElement('div');e.className='empty';e.textContent=rkMine&&!rkMine.opt_in?'下の「ランキングに参加する」から参加すると、個人の部に出られます':'まだ誰も記録していません。最初の1本を撮ろう';list.appendChild(e);return}
+    data.forEach(r=>list.appendChild(rkRow(r)));
+  }else{
+    note.textContent='「対抗戦に出る」にしたグループが、1人あたりの平均時間で競います。人数が多くても少なくても公平です。';
+    const {data,error}=await sb.rpc('get_tournament_groups',{tid});
+    if(tab!==tnTab||tid!==tnCur.id)return;
+    list.innerHTML='';
+    if(error){list.innerHTML='<div class="empty">読み込めませんでした</div>';return}
+    if(!data.length){const e=document.createElement('div');e.className='empty';e.textContent='まだ出ているグループはありません。下から自分のグループで出てみよう';list.appendChild(e)}
+    data.forEach(r=>{
+      const el=rkRow({rank:Number(r.rank),name:r.name,minutes:r.avg_minutes,is_me:r.is_mine});
+      const sub=document.createElement('span');sub.className='rk-sub';sub.textContent=`${r.members}人 ・ 1人あたり`;
+      el.querySelector('.rk-name').appendChild(sub);
+      if(r.is_mine){const y=el.querySelector('.rk-name small');if(y)y.textContent='あなたのグループ'}
+      list.appendChild(el);
+    });
+    renderTnMyGroups();
+  }
+}
+async function renderTnMyGroups(){
+  const box=$('#tnMyGroups');
+  const {data,error}=await sb.from('groups').select('id,name,contest_opt_in').order('created_at');
+  box.innerHTML='';
+  if(error||!data||!data.length){show(box,false);return}
+  const h=document.createElement('h3');h.textContent='あなたのグループ';box.appendChild(h);
+  data.forEach(g=>{
+    const row=document.createElement('div');row.className='tn-g';
+    const n=document.createElement('b');n.textContent=g.name;
+    const btn=document.createElement('button');btn.type='button';btn.className='ghost'+(g.contest_opt_in?' on':'');
+    btn.textContent=g.contest_opt_in?'出場中':'対抗戦に出る';
+    btn.onclick=async()=>{
+      if(g.contest_opt_in&&!await askConfirm({title:'対抗戦に出るのをやめますか?',body:`「${g.name}」が対抗戦の順位から外れます。グループの記録は消えません。`,ok:'やめる',icon:'🏆'}))return;
+      btn.disabled=true;
+      const {error}=await sb.rpc('set_group_contest',{gid:g.id,opt:!g.contest_opt_in});
+      btn.disabled=false;
+      if(!error)renderTnList();
+    };
+    row.append(n,btn);box.appendChild(row);
+  });
+}
+function renderTnAdmin(list){
+  const today=dayKey(Date.now());
+  if(!$('#tnStart').value){$('#tnStart').value=today;$('#tnEnd').value=shiftKey(today,6);if(!$('#tnNewName').value)$('#tnNewName').value='第一回秋季全国勉強時間大会'}
+  const box=$('#tnAll');box.innerHTML='';
+  (list||[]).forEach(t=>{
+    const row=document.createElement('div');row.className='tn-g';
+    const n=document.createElement('div');n.style.minWidth='0';
+    const b=document.createElement('b');b.textContent=t.name;const sp=document.createElement('span');sp.textContent=` ${tnDate(t.starts_on)}〜${tnDate(t.ends_on)}`;
+    n.append(b,sp);
+    const del=document.createElement('button');del.type='button';del.className='ghost';del.textContent='削除';
+    del.onclick=async()=>{
+      if(!await askConfirm({title:'この大会を削除しますか?',body:`「${t.name}」が消えます。みんなの記録は消えません。`,ok:'削除',icon:'🏆'}))return;
+      const {error}=await sb.rpc('delete_tournament',{tid:t.id});if(!error)renderTournament();
+    };
+    row.append(n,del);box.appendChild(row);
+  });
+}
+$('#tnCreate').onclick=async()=>{
+  const m=$('#tnMsg');m.className='msg';
+  const nm=$('#tnNewName').value.trim(),s=$('#tnStart').value,e=$('#tnEnd').value,pz=$('#tnNewPrize').value.trim();
+  if(!nm){m.textContent='大会の名前を入れてください';return}
+  if(!s||!e||e<s){m.textContent='終わる日は、始まる日と同じかそれより後にしてください';return}
+  if(daysBetween(s,e)>30){m.textContent='大会の期間は31日までにしてください';return}
+  $('#tnCreate').disabled=true;
+  const {error}=await sb.rpc('create_tournament',{nm,s,e,pz:pz||null});
+  $('#tnCreate').disabled=false;
+  if(error){m.textContent=/not_admin/.test(error.message)?'大会を開けるのは運営だけです':'開けませんでした。もう一度試してください';return}
+  m.className='msg ok';m.textContent=`「${nm}」を開きました`;$('#tnNewName').value='';$('#tnNewPrize').value='';
+  renderTournament();
+};
+
 /* ---------- じぶん ---------- */
 let mKey=dayKey(Date.now());
 async function renderMine(){
@@ -1382,7 +1591,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-21a';
+const APP_VERSION='2026-10-21c';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
