@@ -218,6 +218,30 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .rk-gap{text-align:center;color:var(--sub);font-size:12px;letter-spacing:.3em}
 .rk-p{font-size:14px;color:var(--sub);line-height:1.7;margin:0}
 .forgot-note{font-size:14px;color:var(--sub);margin:14px 0 0;line-height:1.6}
+/* はじめての人向けの案内 */
+.guide{position:fixed;inset:0;z-index:28;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
+.gd-card{width:100%;max-width:360px;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:26px;padding:22px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:mpop .2s}
+.gd-dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
+.gd-dots i{width:7px;height:7px;border-radius:99px;background:#2a2f38;transition:width .2s,background .2s}
+.gd-dots i.on{width:22px;background:var(--main)}
+.gd-step{min-height:250px}
+.gd-step h3{font-size:22px;font-weight:800;margin:0 0 8px}
+.gd-step p{font-size:15px;line-height:1.7;color:var(--sub);margin:0}
+.gd-step p b{color:var(--ink)}
+.gd-hero{display:flex;align-items:center;gap:12px;font-size:40px;font-weight:800;margin:26px 0 24px}
+.gd-hero .dot{width:16px;height:16px;border-radius:99px;background:var(--main);box-shadow:0 0 18px var(--main)}
+.gd-ex{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 10px}
+.gd-t{position:relative;aspect-ratio:3/4;border-radius:14px;overflow:hidden;background:linear-gradient(160deg,var(--c1),var(--c2));border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.gd-t span{font-size:34px}
+.gd-t small{position:absolute;left:0;right:0;bottom:0;padding:14px 4px 6px;font-size:11px;font-weight:800;text-align:center;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.gd-sub{font-size:13px!important}
+.gd-list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.gd-list li{display:flex;gap:12px;align-items:center;background:#0f1115;border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-size:14px;color:var(--sub)}
+.gd-list li>b{font-size:20px}
+.gd-list li span b{color:var(--ink)}
+.gd-btns{display:flex;gap:8px;margin-top:18px}
+.gd-btns .ghost{flex:0 0 92px;border-radius:16px;font-weight:800}
+.gd-btns .big{margin:0}
 label.sw{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub)}
 label.sw input{width:20px;height:20px;accent-color:var(--main)}
 </style>
@@ -225,7 +249,7 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
 <body>
 <header>
   <h1>スタログ</h1>
-  <div class="me hidden" id="meBox"><span id="meName"></span><button class="link" id="logout">ログアウト</button></div>
+  <div class="me hidden" id="meBox"><span id="meName"></span><button type="button" class="link" id="guideOpen">使い方</button><button class="link" id="logout">ログアウト</button></div>
 </header>
 
 <!-- 設定がまだのとき -->
@@ -423,6 +447,44 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
   </div>
 </div>
 
+<div class="guide hidden" id="guide" role="dialog" aria-modal="true" aria-labelledby="gdTitle">
+  <div class="gd-card">
+    <div class="gd-dots" id="gdDots"><i class="on"></i><i></i><i></i></div>
+
+    <div class="gd-step" data-s="0">
+      <div class="gd-hero"><span class="dot"></span>スタログ</div>
+      <h3 id="gdTitle">ようこそ!</h3>
+      <p>勉強中に<b>2秒だけ</b>動画を撮って、科目と時間を記録するアプリです。グループの友達と、お互いの1日を見せ合えます。</p>
+    </div>
+
+    <div class="gd-step hidden" data-s="1">
+      <h3>こんな動画でOK</h3>
+      <p>顔は映さなくて大丈夫。手元やノートだけで十分です。</p>
+      <div class="gd-ex">
+        <div class="gd-t" style="--c1:#f7f5ef;--c2:#d9d3c4"><span>📒</span><small>ノートだけ</small></div>
+        <div class="gd-t" style="--c1:#6b4a2f;--c2:#3b2717"><span>✍️</span><small>手元とペン</small></div>
+        <div class="gd-t" style="--c1:#2a3140;--c2:#14161b"><span>💻</span><small>画面やタブレット</small></div>
+      </div>
+      <p class="gd-sub">2秒なので、ブレていても暗くても気にしなくてOK</p>
+    </div>
+
+    <div class="gd-step hidden" data-s="2">
+      <h3>安心して投稿してね</h3>
+      <ul class="gd-list">
+        <li><b>🔒</b><span>見られるのは、<b>同じグループの人だけ</b></span></li>
+        <li><b>⏱</b><span><b>15分</b>でも立派な記録。短くても大丈夫</span></li>
+        <li><b>🗑</b><span>自分の動画は、<b>いつでも消せる</b></span></li>
+        <li><b>🙈</b><span>Googleなどの<b>検索には出ない</b></span></li>
+      </ul>
+    </div>
+
+    <div class="gd-btns">
+      <button type="button" class="ghost" id="gdSkip">あとで</button>
+      <button type="button" class="big main" id="gdNext">次へ</button>
+    </div>
+  </div>
+</div>
+
 <nav class="tabs hidden" id="tabs">
   <button data-p="pShoot" class="on"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>撮る</button>
   <button data-p="pMine"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>じぶん</button>
@@ -503,6 +565,7 @@ async function onSession(session){
   show($('#authView'),false);show($('#appView'),true);show($('#tabs'),true);show($('#meBox'),true);
   updateChatBadge();
   renderShootLive();joinLive();
+  if(!lsGet('sl_guided',false))openGuide();
   if(joinFromUrl){$('#joinCode').value=joinFromUrl.toUpperCase();openTab('pGroup')}
 }
 async function ensureProfile(){
@@ -1180,6 +1243,21 @@ $('#rkLeave').onclick=async()=>{
   if(await setRanking(false,null,$('#rkMsg2')))renderRank();
 };
 
+/* ---------- はじめての人向けの案内 ---------- */
+let gdStep=0;
+function gdShow(n){
+  gdStep=n;
+  document.querySelectorAll('#guide .gd-step').forEach(el=>show(el,Number(el.dataset.s)===n));
+  document.querySelectorAll('#gdDots i').forEach((d,i)=>d.classList.toggle('on',i===n));
+  $('#gdNext').textContent=n<2?'次へ':'1本目を撮ってみる';
+  show($('#gdSkip'),n<2);
+}
+function openGuide(){gdShow(0);show($('#guide'),true)}
+function closeGuide(){show($('#guide'),false);lsSet('sl_guided',true)}
+$('#gdNext').onclick=()=>{if(gdStep<2)gdShow(gdStep+1);else{closeGuide();openTab('pShoot')}};
+$('#gdSkip').onclick=closeGuide;
+$('#guideOpen').onclick=openGuide;
+
 /* ---------- じぶん ---------- */
 let mKey=dayKey(Date.now());
 async function renderMine(){
@@ -1304,7 +1382,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-19g';
+const APP_VERSION='2026-10-21a';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
