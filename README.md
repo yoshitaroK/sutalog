@@ -27,6 +27,11 @@
 - 全国勉強時間ランキング(今日・この1週間、上位50人と自分の順位)
 - 参加した人だけが、ランキング用の名前で載る。1本の記録で数えるのは前に撮ってから実際にたった時間まで(ごまかし防止)
 
+**大会**
+- 運営が期間と景品を決めて開く全国大会。個人の部(ランキング参加者)とグループ対抗の部(1人あたりの平均時間)
+- はじめての人向けの案内(初回ログイン時、ヘッダーの「使い方」から再表示)
+- パスワードを忘れたときのメール再設定
+
 **そのほか**
 - メールアドレスとパスワードで登録。iPhoneのパスワード保存に対応、ログインしたままになる
 - ホーム画面に追加できる(専用アイコン)。新しい版が出たら自動で読み直す
@@ -50,6 +55,7 @@
 |---|---|
 | `supabase/2026-10-nice-goal.sql` | 👏 ナイス(`reactions` 表)と、みんなで目標(`groups.goal_minutes`、`set_group_goal`) |
 | `supabase/2026-10-chat.sql` | チャット(`messages` 表とリアルタイム) |
+| `supabase/2026-10-tournament.sql` | 大会(`tournaments`・`app_admins`・`groups.contest_opt_in`、`create_tournament` など)。ランキングの関数をログインした人だけに限る設定も含む |
 | `supabase/2026-10-ranking.sql` | 全国ランキング(`profiles.rank_opt_in` / `rank_name`、`set_ranking` / `my_ranking` / `get_ranking`) |
 
 実行のしかた:Supabase → 左のメニューの **SQL Editor** → **+ New** → ファイルの中身を全部貼る → **Run** →「Success」と出ればOK。
