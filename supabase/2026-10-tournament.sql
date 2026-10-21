@@ -3,7 +3,7 @@
 --
 -- ・大会を開けるのは運営(app_admins に入っている人)だけ
 -- ・個人の部:ランキングに参加している人だけが、ランキング用の名前で載る
--- ・グループ対抗の部:「対抗戦に出る」にしたグループだけが出る。メンバー全員の合計時間で順位を決める
+-- ・グループ対抗の部:運営が出場させたグループだけが出る。メンバー全員の合計時間で順位を決める
 -- ・数える時間はランキングと同じ(1本で数えるのは、前に撮ってから実際にたった時間まで)
 
 -- ========== 運営 ==========
@@ -58,14 +58,25 @@ begin
   delete from public.tournaments where id = tid;
 end $$;
 
--- グループ対抗に出る/出ない(そのグループのメンバーなら誰でも変えられる)
+-- グループ対抗に出す/出さない(運営だけが決める)
 create or replace function public.set_group_contest(gid public.groups.id%type, opt boolean)
 returns void language plpgsql security definer set search_path = public as $$
 begin
-  if not exists (select 1 from public.group_members where group_id = gid and user_id = auth.uid()) then
-    raise exception 'not_member';
-  end if;
+  if not public.is_app_admin() then raise exception 'not_admin'; end if;
   update public.groups set contest_opt_in = opt where id = gid;
+end $$;
+
+-- 運営用:全部のグループの一覧(名前・人数・出場しているか)
+create or replace function public.admin_list_groups()
+returns table (id text, name text, members bigint, contest_opt_in boolean)
+language plpgsql security definer set search_path = public stable as $$
+begin
+  if not public.is_app_admin() then raise exception 'not_admin'; end if;
+  return query
+    select gr.id::text, gr.name, count(gm.user_id), gr.contest_opt_in
+    from public.groups gr left join public.group_members gm on gm.group_id = gr.id
+    group by gr.id, gr.name, gr.contest_opt_in
+    order by gr.contest_opt_in desc, count(gm.user_id) desc, gr.name;
 end $$;
 
 -- 期間中に数える時間(中だけで使う。画面からは直接呼べない)
@@ -133,7 +144,7 @@ begin
   foreach f in array array[
     'public.is_app_admin()', 'public.create_tournament(text, date, date, text)', 'public.delete_tournament(bigint)',
     'public.set_group_contest(' || format_type((select atttypid from pg_attribute where attrelid = 'public.groups'::regclass and attname = 'id'), null) || ', boolean)',
-    'public.get_tournament_people(bigint)', 'public.get_tournament_groups(bigint)', 'public._credited(date, date)',
+    'public.get_tournament_people(bigint)', 'public.get_tournament_groups(bigint)', 'public._credited(date, date)', 'public.admin_list_groups()',
     'public.set_ranking(boolean, text)', 'public.my_ranking()', 'public.get_ranking(text)'
   ] loop
     if to_regprocedure(f) is not null then
