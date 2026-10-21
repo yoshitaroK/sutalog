@@ -2,7 +2,7 @@
 -- Supabase の SQL Editor に全部貼り付けて Run を押す。何回実行しても大丈夫。
 --
 -- ・大会を開けるのは運営(app_admins に入っている人)だけ
--- ・個人の部:全員が出る。ランキング用の名前を決めている人はその名前、決めていない人は「匿名の勉強家」で載る
+-- ・個人の部:全員が出る。ランキング用の名前を決めている人はその名前、決めていない人はアカウントの表示名で載る
 -- ・グループ対抗の部:運営が出場させたグループだけが出る。メンバー全員の合計時間で順位を決める
 -- ・数える時間はランキングと同じ(1本で数えるのは、前に撮ってから実際にたった時間まで)
 
@@ -108,7 +108,7 @@ language sql security definer set search_path = public stable as $$
     where cr.minutes > 0
   )
   select ranked.r,
-         case when p.rank_opt_in and p.rank_name is not null then p.rank_name else '匿名の勉強家' end,
+         coalesce(case when p.rank_opt_in then p.rank_name end, p.name, '名無し'),
          ranked.minutes, ranked.user_id = auth.uid()
   from ranked left join public.profiles p on p.id = ranked.user_id
   where ranked.r <= 50 or ranked.user_id = auth.uid()
