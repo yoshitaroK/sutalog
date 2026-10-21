@@ -2,7 +2,7 @@
 -- Supabase の SQL Editor に全部貼り付けて Run を押す。何回実行しても大丈夫。
 --
 -- ・大会を開けるのは運営(app_admins に入っている人)だけ
--- ・個人の部:ランキングに参加している人だけが、ランキング用の名前で載る
+-- ・個人の部:全員が出る。ランキング用の名前を決めている人はその名前、決めていない人は「匿名の勉強家」で載る
 -- ・グループ対抗の部:運営が出場させたグループだけが出る。メンバー全員の合計時間で順位を決める
 -- ・数える時間はランキングと同じ(1本で数えるのは、前に撮ってから実際にたった時間まで)
 
@@ -96,7 +96,7 @@ language sql security definer set search_path = public stable as $$
   from c group by user_id;
 $$;
 
--- 個人の部(上位50人と自分)
+-- 個人の部(全員参加。上位50人と自分)
 create or replace function public.get_tournament_people(tid bigint)
 returns table (rank bigint, name text, minutes bigint, is_me boolean)
 language sql security definer set search_path = public stable as $$
@@ -104,13 +104,15 @@ language sql security definer set search_path = public stable as $$
   cr as (select * from public._credited((select starts_on from t), (select ends_on from t))),
   ranked as (
     select cr.user_id, cr.minutes, rank() over (order by cr.minutes desc) as r
-    from cr join public.profiles p on p.id = cr.user_id and p.rank_opt_in
+    from cr
     where cr.minutes > 0
   )
-  select ranked.r, coalesce(p.rank_name, '名無し'), ranked.minutes, ranked.user_id = auth.uid()
-  from ranked join public.profiles p on p.id = ranked.user_id
+  select ranked.r,
+         case when p.rank_opt_in and p.rank_name is not null then p.rank_name else '匿名の勉強家' end,
+         ranked.minutes, ranked.user_id = auth.uid()
+  from ranked left join public.profiles p on p.id = ranked.user_id
   where ranked.r <= 50 or ranked.user_id = auth.uid()
-  order by ranked.r, p.rank_name;
+  order by ranked.r;
 $$;
 
 -- グループ対抗の部(出ると決めたグループ・合計時間。上位30グループと自分のグループ)

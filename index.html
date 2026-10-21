@@ -1395,12 +1395,12 @@ async function renderTnList(){
   list.innerHTML='<div class="empty">読み込み中…</div>';
   show($('#tnMyGroups'),false);
   if(tab==='people'){
-    note.textContent='ランキングに参加している人が、ランキング用の名前で載ります。数え方はランキングと同じです。';
+    note.textContent='全員が出場します。ランキング用の名前を決めている人はその名前、決めていない人は「匿名の勉強家」で載ります。数え方はランキングと同じです。';
     const {data,error}=await sb.rpc('get_tournament_people',{tid});
     if(tab!==tnTab||tid!==tnCur.id)return;
     list.innerHTML='';
     if(error){list.innerHTML='<div class="empty">読み込めませんでした</div>';return}
-    if(!data.length){const e=document.createElement('div');e.className='empty';e.textContent=rkMine&&!rkMine.opt_in?'下の「ランキングに参加する」から参加すると、個人の部に出られます':'まだ誰も記録していません。最初の1本を撮ろう';list.appendChild(e);return}
+    if(!data.length){const e=document.createElement('div');e.className='empty';e.textContent='まだ誰も記録していません。最初の1本を撮ろう';list.appendChild(e);return}
     data.forEach(r=>list.appendChild(rkRow(r)));
   }else{
     note.textContent='運営が選んだグループが、メンバー全員の勉強時間の合計で競います。';
@@ -1617,7 +1617,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-21f';
+const APP_VERSION='2026-10-22a';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
