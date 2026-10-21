@@ -242,22 +242,52 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .gd-btns{display:flex;gap:8px;margin-top:18px}
 .gd-btns .ghost{flex:0 0 92px;border-radius:16px;font-weight:800}
 .gd-btns .big{margin:0}
-/* 大会 */
-.tn{border-color:rgba(198,255,61,.45);background:radial-gradient(120% 80% at 100% 0%,rgba(198,255,61,.14),transparent 60%),linear-gradient(180deg,var(--card2),var(--card))}
-.tn-badge{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.06em;border-radius:99px;padding:4px 12px;background:var(--main);color:var(--main-ink)}
-.tn-badge.soon{background:#2a2f38;color:var(--ink)}
-.tn-badge.done{background:#ffd54a;color:#1a1400}
-.tn-name{font-size:24px;margin:10px 0 2px}
-.tn-when{font-size:13px;color:var(--sub);font-weight:700;margin-bottom:14px}
-.tn-when b{color:var(--main)}
-.tn .seg{margin-bottom:6px}
+/* 大会(赤ベースの特別デザイン) */
+.tn{--red:#ff2d46;--red2:#b3001b;--gold:#ffd54a;position:relative;overflow:hidden;border:1px solid rgba(255,45,70,.6);
+  background:radial-gradient(90% 60% at 50% 0%,rgba(255,45,70,.45),transparent 70%),linear-gradient(180deg,#3a0610 0%,#1a0307 55%,#120205 100%);
+  box-shadow:0 0 0 1px rgba(255,213,74,.15) inset,0 18px 50px rgba(179,0,27,.35)}
+.tn::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px)}
+.tn::after{content:"";position:absolute;left:-40%;top:0;width:40%;height:100%;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,255,255,.12),transparent);animation:tnshine 4.5s ease-in-out infinite}
+@keyframes tnshine{0%,60%{left:-40%}100%{left:140%}}
+@media (prefers-reduced-motion:reduce){.tn::after{animation:none;display:none}}
+.tn>*{position:relative}
+.tn-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tn-eyebrow{font-size:11px;font-weight:900;letter-spacing:.32em;color:var(--gold)}
+.tn-badge{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.06em;border-radius:99px;padding:4px 12px;background:var(--red);color:#fff;box-shadow:0 0 14px rgba(255,45,70,.7)}
+.tn-badge.soon{background:#3a0610;color:#ffc2ca;border:1px solid rgba(255,45,70,.6);box-shadow:none}
+.tn-badge.done{background:var(--gold);color:#2a1a00;box-shadow:0 0 14px rgba(255,213,74,.6)}
+.tn-trophy{font-size:54px;text-align:center;margin:8px 0 0;filter:drop-shadow(0 0 18px rgba(255,213,74,.55))}
+.tn-name{font-size:24px;font-weight:900;text-align:center;margin:4px 0 4px;line-height:1.35;text-wrap:balance;color:#fff;text-shadow:0 0 22px rgba(255,45,70,.8)}
+.tn-when{font-size:13px;color:#ffb3bd;font-weight:700;margin-bottom:14px;text-align:center}
+.tn-when b{color:var(--gold)}
+.tn .seg{margin-bottom:6px;background:rgba(0,0,0,.35);border-color:rgba(255,45,70,.35)}
+.tn .seg button{color:#ffb3bd}
+.tn .seg button.on{background:var(--red);color:#fff;box-shadow:0 0 14px rgba(255,45,70,.6)}
+.tn .rk-row{background:rgba(0,0,0,.35);border-color:rgba(255,45,70,.25)}
+.tn .rk-row.me{border-color:var(--gold);box-shadow:0 0 14px rgba(255,213,74,.25)}
+.tn .rk-row.top1{background:linear-gradient(90deg,rgba(255,213,74,.22),rgba(0,0,0,.35) 65%);border-color:rgba(255,213,74,.5)}
+.tn .rk-name small{color:var(--gold)}
+.tn .rk-min{color:#fff}
+.tn .note{color:#d98a95}
 .rk-row .rk-sub{display:block;font-size:11px;color:var(--sub);font-weight:700}
+.tn .rk-sub{color:#d98a95}
 .tn-my{margin-top:14px;display:flex;flex-direction:column;gap:8px}
-.tn-my h3{font-size:13px;color:var(--sub);margin:0}
+.tn-my h3{font-size:13px;color:#ffb3bd;margin:0}
 .tn-g{display:flex;align-items:center;gap:10px;justify-content:space-between;background:#0f1115;border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.tn .tn-g{background:rgba(0,0,0,.35);border-color:rgba(255,45,70,.25)}
 .tn-g b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tn-g button{flex:none}
-.tn-g button.on{background:var(--main);color:var(--main-ink);border-color:var(--main)}
+.tn .tn-g .ghost{background:transparent;border-color:rgba(255,45,70,.6);color:#fff}
+.tn .tn-g button.on{background:var(--red);border-color:var(--red);color:#fff}
+.tn-prize{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(90deg,rgba(255,213,74,.18),rgba(255,213,74,.06));border:1px solid rgba(255,213,74,.55);border-radius:14px;padding:10px 12px;margin:-4px 0 14px;font-size:14px;font-weight:800;color:#ffe58a;line-height:1.5}
+.tn-prize::before{content:"🎁";font-size:18px}
+/* 撮るタブの大会のお知らせ */
+.tn-banner{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,45,70,.6);
+  background:linear-gradient(90deg,#5a0716,#2a0409);color:#fff;font-size:14px;font-weight:800;text-align:left;box-shadow:0 8px 24px rgba(179,0,27,.3)}
+.tn-banner .ic{font-size:22px}
+.tn-banner .tx{min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.tn-banner .tx small{font-size:12px;color:#ffb3bd;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tn-banner .go{margin-left:auto;font-size:12px;color:#ffd54a;white-space:nowrap}
 .tn-admin-tag{font-size:11px;font-weight:800;color:var(--sub);border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:middle}
 .tn-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .tn-dates>div{min-width:0}
@@ -323,6 +353,7 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
 
   <!-- 撮る -->
   <div id="pShoot">
+    <button type="button" class="tn-banner hidden" id="tnBanner"></button>
     <button type="button" class="live-banner hidden" id="liveShoot"></button>
     <section class="card timer" id="timerCard">
       <div class="tm-head"><h2>勉強タイマー</h2><span class="tm-state" id="tState">止まっています</span></div>
@@ -423,7 +454,8 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
   <!-- ランキング -->
   <div id="pRank" class="hidden">
     <section class="card tn hidden" id="tnCard">
-      <div class="tn-badge" id="tnBadge"></div>
+      <div class="tn-top"><span class="tn-eyebrow">SUTALOG CUP</span><div class="tn-badge" id="tnBadge"></div></div>
+      <div class="tn-trophy" aria-hidden="true">🏆</div>
       <h2 class="tn-name" id="tnName"></h2>
       <div class="tn-when" id="tnWhen"></div>
       <div class="tn-prize hidden" id="tnPrize"></div>
@@ -612,7 +644,7 @@ async function onSession(session){
   $('#meName').textContent=myName;
   show($('#authView'),false);show($('#appView'),true);show($('#tabs'),true);show($('#meBox'),true);
   updateChatBadge();
-  renderShootLive();joinLive();
+  renderShootLive();joinLive();renderTnBanner();
   if(!lsGet('sl_guided',false))openGuide();
   if(joinFromUrl){$('#joinCode').value=joinFromUrl.toUpperCase();openTab('pGroup')}
 }
@@ -679,7 +711,7 @@ function openTab(p){
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
   ['pShoot','pMine','pGroup','pRank'].forEach(id=>show($('#'+id),id===p));
   if(p==='pRank'){renderRank();renderTournament()}
-  if(p==='pShoot'&&me)renderShootLive();
+  if(p==='pShoot'&&me){renderShootLive();renderTnBanner()}
   if(p==='pMine'){renderMine();renderWeek()}
   if(p==='pGroup')loadGroups();
   window.scrollTo(0,0);
@@ -1322,6 +1354,20 @@ function pickTournament(list){
   if(soon)return soon;
   return list.filter(t=>t.ends_on<today&&daysBetween(t.ends_on,today)<=14).sort((a,b)=>a.ends_on<b.ends_on?1:-1)[0]||null;
 }
+async function renderTnBanner(){
+  const el=$('#tnBanner');
+  const {data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on').order('starts_on',{ascending:false}).limit(30);
+  const t=error?null:pickTournament(data||[]);const today=dayKey(Date.now());
+  if(!t||t.ends_on<today){show(el,false);return}
+  el.innerHTML='';
+  const ic=document.createElement('span');ic.className='ic';ic.textContent='🏆';
+  const tx=document.createElement('span');tx.className='tx';
+  const b=document.createElement('span');b.textContent=today<t.starts_on?`まもなく開催・あと${daysBetween(today,t.starts_on)}日`:`大会開催中・のこり${daysBetween(today,t.ends_on)}日`;
+  const sm=document.createElement('small');sm.textContent=t.name;tx.append(b,sm);
+  const go=document.createElement('span');go.className='go';go.textContent='順位を見る ›';
+  el.append(ic,tx,go);show(el,true);
+}
+$('#tnBanner').onclick=()=>openTab('pRank');
 async function renderTournament(){
   let {data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on,prize').order('starts_on',{ascending:false}).limit(30);
   if(error)({data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on').order('starts_on',{ascending:false}).limit(30));
@@ -1545,7 +1591,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-21b';
+const APP_VERSION='2026-10-21c';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});
