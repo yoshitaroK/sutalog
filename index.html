@@ -157,6 +157,13 @@ label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:
 .modal-card{width:100%;max-width:340px;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:24px;padding:22px 20px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:mpop .18s}
 .modal-icon{width:56px;height:56px;margin:0 auto 12px;border-radius:18px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;font-size:26px}
 .modal-icon video{width:100%;height:100%;object-fit:cover}
+.cg-card{background:radial-gradient(120% 80% at 50% 0%,rgba(255,45,70,.35),transparent 60%),linear-gradient(180deg,#2a0b10,#120507);border-color:rgba(255,213,74,.45);box-shadow:0 0 40px rgba(255,45,70,.35),0 20px 60px rgba(0,0,0,.6)}
+.cg-medal{font-size:64px;line-height:1;margin:4px 0 8px}
+.cg-card .cg-tn{font-size:12px;font-weight:800;color:#ff8a98;letter-spacing:.05em}
+.cg-card h3{font-size:22px;margin-top:6px}
+.cg-place{font-size:32px;font-weight:900;white-space:nowrap;color:#ffd54a;margin:6px 0 2px;text-shadow:0 0 18px rgba(255,213,74,.5)}
+.cg-card p{color:#f3d6da}
+.cg-card .cg-ok{width:100%;margin-top:16px;padding:13px;border-radius:14px;font-size:16px;font-weight:800;background:linear-gradient(90deg,#ffd54a,#ffb02e);color:#2a0b10;border:0}
 .modal-card h3{margin:0;font-size:18px;font-weight:800}
 .modal-card p{margin:8px 0 0;font-size:14px;color:var(--sub);line-height:1.6;white-space:pre-line}
 .modal-btns{display:flex;gap:10px;margin-top:18px}
@@ -519,6 +526,16 @@ label.sw input{width:20px;height:20px;accent-color:var(--main)}
   </form>
 </div>
 
+<div class="modal hidden" id="congrats" role="dialog" aria-modal="true" aria-labelledby="cgTitle">
+  <div class="modal-card cg-card">
+    <div class="cg-tn" id="cgTn"></div>
+    <div class="cg-medal" id="cgMedal">🎉</div>
+    <h3 id="cgTitle">おめでとう!</h3>
+    <div class="cg-place" id="cgPlace"></div>
+    <p id="cgBody"></p>
+    <button type="button" class="cg-ok" id="cgOk">ありがとう!</button>
+  </div>
+</div>
 <div class="modal hidden" id="modal" role="alertdialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody">
   <div class="modal-card">
     <div class="modal-icon" id="modalIcon"></div>
@@ -646,6 +663,7 @@ async function onSession(session){
   me=session.user;started=true;
   await ensureProfile();
   $('#meName').textContent=myName;
+  loadMedals().then(showCongrats);
   show($('#authView'),false);show($('#appView'),true);show($('#tabs'),true);show($('#meBox'),true);
   updateChatBadge();
   renderShootLive();joinLive();renderTnBanner();
@@ -714,7 +732,7 @@ function openTab(p){
   rollDay();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
   ['pShoot','pMine','pGroup','pRank'].forEach(id=>show($('#'+id),id===p));
-  if(p==='pRank'){renderRank();renderTournament()}
+  if(p==='pRank'){loadMedals().finally(()=>{renderRank();renderTournament()})}
   if(p==='pShoot'&&me){renderShootLive();renderTnBanner()}
   if(p==='pMine'){renderMine();renderWeek()}
   if(p==='pGroup')loadGroups();
@@ -850,7 +868,7 @@ function renderDay(box,clips,names){
     const next=()=>{
       if(i>=clips.length){ov.textContent='おわり';return}
       const c=clips[i];v.src=c.url;
-      ov.textContent=`${i+1}/${clips.length}  ${fmtTime(c.ts)}  ${isGroup?(names[c.user_id]||'')+' ・ ':''}${c.subject}`;
+      ov.textContent=`${i+1}/${clips.length}  ${fmtTime(c.ts)}  ${isGroup?(names[c.user_id]||'')+md(c.user_id)+' ・ ':''}${c.subject}`;
       v.play().catch(()=>{});
     };
     v.onended=()=>{i++;next()};
@@ -864,7 +882,7 @@ function renderDay(box,clips,names){
     const el=document.createElement('div');el.className='th';
     const vv=document.createElement('video');vv.src=c.url+'#t=0.1';vv.preload='metadata';vv.muted=true;vv.playsInline=true;
     const cap=document.createElement('div');cap.className='cap';
-    cap.textContent=`${fmtTime(c.ts)} ${c.subject}`+(isGroup?`\n${names[c.user_id]||''}`:'');
+    cap.textContent=`${fmtTime(c.ts)} ${c.subject}`+(isGroup?`\n${names[c.user_id]||''}${md(c.user_id)}`:'');
     cap.style.whiteSpace='pre-line';
     el.append(vv,cap);
     const nice=document.createElement(c.user_id===me.id?'span':'button');nice.className='nice hidden';nice.dataset.id=c.id;
@@ -979,7 +997,7 @@ async function renderGroupLive(){
   if(!list.length){const e=document.createElement('div');e.className='empty';e.textContent='いまは誰も記録していません。タイマーをスタートしてみよう';box.appendChild(e);return}
   list.forEach(c=>{
     const r=document.createElement('div');r.className='live-row';
-    const n=document.createElement('b');n.textContent=(names[c.user_id]||c.name||'?')+(c.user_id===me.id?'(自分)':'');
+    const n=document.createElement('b');n.textContent=(names[c.user_id]||c.name||'?')+md(c.user_id)+(c.user_id===me.id?'(自分)':'');
     const sj=document.createElement('span');sj.className='subj';sj.textContent=c.subject||'勉強';
     const a=document.createElement('span');a.className='sub';
     a.textContent=c.timer?`⏱ タイマー中 ${fmtMin(Math.max(1,Math.round((Date.now()-c.timer)/60e3)))}`:agoText(c.ts);
@@ -1032,7 +1050,7 @@ function renderChat(stick){
     if(day!==lastDay){const d=document.createElement('div');d.className='msg-day';d.textContent=day;list.appendChild(d);lastDay=day;lastUser=''}
     const mine=m.user_id===me.id;
     const row=document.createElement('div');row.className='msg-row'+(mine?' me':'');
-    if(!mine&&m.user_id!==lastUser){const w=document.createElement('div');w.className='msg-who';w.textContent=names[m.user_id]||'?';row.appendChild(w)}
+    if(!mine&&m.user_id!==lastUser){const w=document.createElement('div');w.className='msg-who';w.textContent=(names[m.user_id]||'?')+md(m.user_id);row.appendChild(w)}
     const line=document.createElement('div');line.className='msg-line';
     const b=document.createElement(mine?'button':'div');b.className='bubble';b.textContent=m.body;
     const t=document.createElement('span');t.className='msg-time';t.textContent=fmtTime(m.created_at);
@@ -1275,7 +1293,7 @@ function rkRow(r){
   const el=document.createElement('div');
   el.className='rk-row'+(r.is_me?' me':'')+(r.rank<=3?' top'+r.rank:'');
   const n=document.createElement('div');n.className='rk-n';n.textContent=r.rank<=3?['🥇','🥈','🥉'][r.rank-1]:r.rank;
-  const nm=document.createElement('div');nm.className='rk-name';nm.textContent=r.name;
+  const nm=document.createElement('div');nm.className='rk-name';nm.textContent=r.name+(r.medals?' '+r.medals:'');
   if(r.is_me){const y=document.createElement('small');y.textContent='あなた';nm.appendChild(y)}
   const m=document.createElement('div');m.className='rk-min';m.textContent=fmtMin(Number(r.minutes));
   el.append(n,nm,m);return el;
@@ -1373,8 +1391,12 @@ async function renderTnBanner(){
 }
 $('#tnBanner').onclick=()=>openTab('pRank');
 async function renderTournament(){
-  let {data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on,prize').order('starts_on',{ascending:false}).limit(30);
-  if(error)({data,error}=await sb.from('tournaments').select('id,name,starts_on,ends_on').order('starts_on',{ascending:false}).limit(30));
+  // 新しい列は Supabase に設定を足すまで無いので、無ければ少ない列で読み直す
+  let data,error;
+  for(const cols of ['id,name,starts_on,ends_on,prize,finalized_at','id,name,starts_on,ends_on,prize','id,name,starts_on,ends_on']){
+    ({data,error}=await sb.from('tournaments').select(cols).order('starts_on',{ascending:false}).limit(30));
+    if(!error)break;
+  }
   if(error){show($('#tnCard'),false);show($('#tnAdmin'),false);return}   // Supabaseに設定が無いとき
   const adm=await sb.rpc('is_app_admin');tnAdmin=!adm.error&&adm.data===true;
   show($('#tnAdmin'),tnAdmin);if(tnAdmin)renderTnAdmin(data);
@@ -1471,12 +1493,27 @@ function renderTnAdmin(list){
     const n=document.createElement('div');n.style.minWidth='0';
     const b=document.createElement('b');b.textContent=t.name;const sp=document.createElement('span');sp.textContent=` ${tnDate(t.starts_on)}〜${tnDate(t.ends_on)}`;
     n.append(b,sp);
+    const btns=document.createElement('div');btns.style.cssText='display:flex;gap:6px;flex-shrink:0';
+    if(today>t.ends_on&&'finalized_at' in t){
+      const fin=document.createElement('button');fin.type='button';fin.className='ghost'+(t.finalized_at?' on':'');
+      fin.textContent=t.finalized_at?'確定済み':'結果を確定';
+      fin.onclick=async()=>{
+        if(!await askConfirm({title:t.finalized_at?'結果を確定しなおしますか?':'結果を確定してメダルを配りますか?',body:`「${t.name}」の今の順位で、1〜3位に🥇🥈🥉が付きます。記録した人には次に開いたとき「おめでとう」が出ます。`,ok:'確定する',icon:'🏅'}))return;
+        fin.disabled=true;
+        const {data:n,error}=await sb.rpc('finalize_tournament',{tid:t.id});
+        fin.disabled=false;
+        if(error){await askConfirm({title:'確定できませんでした',body:/not_ended/.test(error.message)?'大会の最終日が終わってから(翌朝4時以降に)押してください':'もう一度試してください',ok:'OK',icon:'⚠️'});return}
+        await askConfirm({title:'確定しました',body:`${n}人の順位を記録して、メダルを配りました`,ok:'OK',icon:'🏅'});
+        await loadMedals();renderTournament();showCongrats();
+      };
+      btns.appendChild(fin);
+    }
     const del=document.createElement('button');del.type='button';del.className='ghost';del.textContent='削除';
     del.onclick=async()=>{
       if(!await askConfirm({title:'この大会を削除しますか?',body:`「${t.name}」が消えます。みんなの記録は消えません。`,ok:'削除',icon:'🏆'}))return;
       const {error}=await sb.rpc('delete_tournament',{tid:t.id});if(!error)renderTournament();
     };
-    row.append(n,del);box.appendChild(row);
+    btns.appendChild(del);row.append(n,btns);box.appendChild(row);
   });
 }
 $('#tnCreate').onclick=async()=>{
@@ -1506,6 +1543,31 @@ $('#mNext').onclick=()=>{if(mKey<dayKey(Date.now())){mKey=shiftKey(mKey,1);rende
 
 /* ---------- グループ ---------- */
 let groups=[],curGroup=null,members=[],names={},gKey=dayKey(Date.now());
+// 大会のメダル(user_id → '🥇🥈' など)。名前の横に付ける
+let medals={};
+const md=id=>medals[id]?' '+medals[id]:'';
+async function loadMedals(){
+  const {data,error}=await sb.rpc('get_medals');
+  if(error)return;   // Supabaseに設定が無いとき
+  medals={};(data||[]).forEach(r=>medals[r.user_id]=r.medals);
+  if(me)$('#meName').textContent=myName+md(me.id);
+}
+// 大会の結果が確定したら、記録した人に1回だけ「おめでとう」を出す
+async function showCongrats(){
+  const {data,error}=await sb.rpc('my_tournament_results');
+  if(error||!data)return;
+  const seen=lsGet('sl_congrats',[]),r=data.find(x=>!seen.includes(x.tournament_id));
+  if(!r)return;
+  lsSet('sl_congrats',[...seen,r.tournament_id]);
+  const top=r.place<=3;
+  $('#cgTn').textContent=r.name;
+  $('#cgMedal').textContent=top?['🥇','🥈','🥉'][r.place-1]:'🎉';
+  $('#cgTitle').textContent='おめでとう!';
+  $('#cgPlace').textContent=`あなたは${r.place}位入賞`;
+  $('#cgBody').textContent=`${r.participants}人中 ${r.place}位 ・ 合計 ${fmtMin(Number(r.minutes))}`+(top?`\n${['金','銀','銅'][r.place-1]}メダルがあなたの名前の横に付きました`+(r.place===1&&r.prize?`\n景品:${r.prize}`:''):'\n大会に出てくれてありがとう。次の大会も待ってます');
+  show($('#congrats'),true);
+}
+$('#cgOk').onclick=()=>{show($('#congrats'),false);showCongrats()};
 function gmsg(t,ok){$('#gMsg').className=ok?'msg ok':'msg';$('#gMsg').textContent=t||''}
 async function loadGroups(){
   // goal_minutes は Supabase に設定を足すまで無いので、無ければ従来どおり読む
@@ -1536,7 +1598,7 @@ async function selectGroup(g){
   const {data:profs}=await sb.from('profiles').select('id,name').in('id',members.length?members:[me.id]);
   names={};(profs||[]).forEach(p=>names[p.id]=p.name);
   const mb=$('#gMembers');mb.innerHTML='';
-  members.forEach(id=>{const s=document.createElement('span');s.className='mem';s.textContent=(names[id]||'?')+(id===me.id?'(自分)':'');mb.appendChild(s)});
+  members.forEach(id=>{const s=document.createElement('span');s.className='mem';s.textContent=(names[id]||'?')+md(id)+(id===me.id?'(自分)':'');mb.appendChild(s)});
   renderGroupDay();renderGroupLive();updateChatBadge();
 }
 async function renderGroupDay(){
@@ -1617,7 +1679,7 @@ setInterval(rollDay,60e3);
 /* ---------- 新しい版が出たら自動で切り替える ---------- */
 // ホーム画面から開くと古いページが残りやすいので、開き直したときに確認する。
 // 中身を変えたら APP_VERSION の値も必ず変える。
-const APP_VERSION='2026-10-22b';
+const APP_VERSION='2026-10-27a';
 async function checkUpdate(){
   try{
     const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});

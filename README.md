@@ -29,6 +29,7 @@
 
 **大会**
 - 運営が期間と景品を決めて開く全国大会。個人の部(全員参加・ランキング用の名前がなければアカウント名)とグループ対抗の部(運営が選んだグループ・合計時間)
+- 大会が終わったら運営が「結果を確定」→ 1〜3位の名前の横に🥇🥈🥉が付く(ずっと残る)。記録した人には「おめでとう!あなたは○位入賞」が1回出る
 - はじめての人向けの案内(初回ログイン時、ヘッダーの「使い方」から再表示)
 - パスワードを忘れたときのメール再設定
 
@@ -56,6 +57,7 @@
 | `supabase/2026-10-nice-goal.sql` | 👏 ナイス(`reactions` 表)と、みんなで目標(`groups.goal_minutes`、`set_group_goal`) |
 | `supabase/2026-10-chat.sql` | チャット(`messages` 表とリアルタイム) |
 | `supabase/2026-10-tournament.sql` | 大会(`tournaments`・`app_admins`・`groups.contest_opt_in`、`create_tournament` など)。ランキングの関数をログインした人だけに限る設定も含む |
+| `supabase/2026-10-medals.sql` | 大会のメダルと結果(`tournament_results`・`tournaments.finalized_at`、`finalize_tournament` / `get_medals` / `my_tournament_results`)。ランキングと大会の順位にメダルの列を足す |
 | `supabase/2026-10-ranking.sql` | 全国ランキング(`profiles.rank_opt_in` / `rank_name`、`set_ranking` / `my_ranking` / `get_ranking`) |
 
 実行のしかた:Supabase → 左のメニューの **SQL Editor** → **+ New** → ファイルの中身を全部貼る → **Run** →「Success」と出ればOK。
